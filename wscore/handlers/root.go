@@ -41,7 +41,7 @@ func (handler *wshandler) Handler(w http.ResponseWriter, r *http.Request) {
 func (handler *wshandler) onMessage(client *Client) {
 	conn := client.Conn
 	for {
-		var req dto.WSRequestDTO
+		var req dto.WSRequest
 		err := conn.ReadJSON(&req)
 		if err != nil {
 			fmt.Println("Error: ", err)
@@ -52,31 +52,33 @@ func (handler *wshandler) onMessage(client *Client) {
 			subscribe(client, req)
 		case dto.UNSUBSCRIBE:
 			unsubscribe(client, req)
+		case dto.BROADCAST:
+			broadcast(client, req)
 		default:
 			fmt.Println("Action do not support")
 		}
 	}
 }
 
-func unsubscribe(client *Client, req dto.WSRequestDTO) {
-	var payload dto.SubscribeDTO
+func broadcast(client *Client, req dto.WSRequest) {
+	var payload dto.UserBroadCast
 	err := json.Unmarshal([]byte(req.Payload), &payload)
 	if err != nil {
-		fmt.Println("Error when process payload", err)
-		return
+		fmt.Println("Error: ", err)
 	}
-	subscribe := Subscribe{Client: client, Destination: payload.Destination}
+	clientBroadcast := ClientBroadcast{Client: client, Destination: payload.Destination, Data: payload.Data}
+	client.Hub.ClientBroadcast <- &clientBroadcast
+}
+
+func unsubscribe(client *Client, req dto.WSRequest) {
+	payload := req.Payload
+	subscribe := Subscribe{Client: client, Destination: payload}
 	client.Hub.Unsubscribe <- &subscribe
 }
 
-func subscribe(client *Client, req dto.WSRequestDTO) {
-	var payload dto.SubscribeDTO
-	err := json.Unmarshal([]byte(req.Payload), &payload)
-	if err != nil {
-		fmt.Println("Error when process payload", err)
-		return
-	}
-	subscribe := Subscribe{Client: client, Destination: payload.Destination}
+func subscribe(client *Client, req dto.WSRequest) {
+	payload := req.Payload
+	subscribe := Subscribe{Client: client, Destination: payload}
 	client.Hub.Subscribe <- &subscribe
 }
 
@@ -87,10 +89,9 @@ func (handler *wshandler) onConnectionOpen(client *Client) {
 func (handler *wshandler) onConnectClosed(client *Client) {
 	defer func() {
 		err := client.Conn.Close()
+		handler.hub.Unregister <- client
 		if err != nil {
 			log.Println("Error when close connection")
-			return
 		}
-		handler.hub.Unregister <- client
 	}()
 }
