@@ -3,18 +3,18 @@ package main
 import (
 	"flag"
 	"log"
-	"mem-ws/services/ws"
 	"mem-ws/wscore"
+	"mem-ws/wscore/handlers"
 	"net/http"
 )
 
-var addr = flag.String("addr", "localhost:9999", "http service address")
+var addr = flag.String("addr", "localhost:8999", "http service address")
 
 func main() {
 	upgrader := wscore.DefInstance()
-	hub := wscore.NewHub()
+	hub := handlers.NewHub()
 	go hub.Start()
-	wsService := ws.New(upgrader, hub)
+	wsService := handlers.New(upgrader, hub)
 	http.HandleFunc("/ws", wsService.Handler)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
