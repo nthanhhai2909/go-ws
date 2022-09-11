@@ -24,17 +24,25 @@ func (h *Hub) Start() {
 	for {
 		select {
 		case client := <-h.Register:
-			h.Clients[client] = struct{}{}
+			h.register(client)
 		case client := <-h.Unregister:
-			if _, ok := h.Clients[client]; ok {
-				delete(h.Clients, client)
-				close(client.Outbound)
-			}
+			h.unregister(client)
 		case subscribe := <-h.Subscribe:
 			h.subscribe(subscribe)
 		case subscribe := <-h.Unsubscribe:
 			h.unsubscribe(subscribe)
 		}
+	}
+}
+
+func (h *Hub) register(client *Client) {
+	h.Clients[client] = struct{}{}
+}
+
+func (h *Hub) unregister(client *Client) {
+	if _, ok := h.Clients[client]; ok {
+		delete(h.Clients, client)
+		close(client.Outbound)
 	}
 }
 
