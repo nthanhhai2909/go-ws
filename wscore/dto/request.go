@@ -5,8 +5,3 @@ type WSRequest struct {
 	Action  Action `json:"action"`
 	Payload string `json:"payload"`
 }
-
-type UserBroadCast struct {
-	Destination string `json:"destination"`
-	Data        string `json:"data"`
-}

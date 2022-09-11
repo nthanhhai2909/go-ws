@@ -3,24 +3,24 @@ package handlers
 import "fmt"
 
 type Hub struct {
-	Clients         map[*Client]struct{}
-	Register        chan *Client
-	Unregister      chan *Client
-	Subscribe       chan *Subscribe
-	Unsubscribe     chan *Subscribe
-	Topics          map[string]map[*Client]struct{}
-	ClientBroadcast chan *ClientBroadcast
+	Clients     map[*Client]struct{}
+	Register    chan *Client
+	Unregister  chan *Client
+	Subscribe   chan *Subscribe
+	Unsubscribe chan *Subscribe
+	Topics      map[string]map[*Client]struct{}
+	Broadcast   chan *Broadcast
 }
 
 func NewHub() *Hub {
 	return &Hub{
-		Clients:         make(map[*Client]struct{}),
-		Register:        make(chan *Client),
-		Unregister:      make(chan *Client),
-		Subscribe:       make(chan *Subscribe),
-		Unsubscribe:     make(chan *Subscribe),
-		Topics:          make(map[string]map[*Client]struct{}),
-		ClientBroadcast: make(chan *ClientBroadcast),
+		Clients:     make(map[*Client]struct{}),
+		Register:    make(chan *Client),
+		Unregister:  make(chan *Client),
+		Subscribe:   make(chan *Subscribe),
+		Unsubscribe: make(chan *Subscribe),
+		Topics:      make(map[string]map[*Client]struct{}),
+		Broadcast:   make(chan *Broadcast),
 	}
 }
 
@@ -35,8 +35,8 @@ func (h *Hub) Start() {
 			h.subscribe(subscribe)
 		case subscribe := <-h.Unsubscribe:
 			h.unsubscribe(subscribe)
-		case clientBroadcast := <-h.ClientBroadcast:
-			h.clientBroadcast(clientBroadcast)
+		case broadcast := <-h.Broadcast:
+			h.broadcast(broadcast)
 		}
 	}
 }
@@ -55,7 +55,7 @@ func (h *Hub) unregister(client *Client) {
 }
 
 func (h *Hub) clearAllClientSub(client *Client) {
-	topics := client.SubscribeTopic
+	topics := client.SubscribeTopics
 	if len(topics) == 0 {
 		return
 	}
@@ -78,7 +78,7 @@ func (h *Hub) unsubscribe(subscribe *Subscribe) {
 	delete(clients, client)
 }
 
-func (h *Hub) clientBroadcast(broadcast *ClientBroadcast) {
+func (h *Hub) broadcast(broadcast *Broadcast) {
 	sentClient := broadcast.Client
 	payload := broadcast.Data
 	destination := broadcast.Destination
