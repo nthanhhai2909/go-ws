@@ -46,20 +46,36 @@ func (h *Hub) register(client *Client) {
 }
 
 func (h *Hub) unregister(client *Client) {
+	fmt.Println("A user unregister")
 	if _, ok := h.Clients[client]; ok {
 		delete(h.Clients, client)
 		close(client.Outbound)
+		h.clearAllClientSub(client)
+	}
+}
+
+func (h *Hub) clearAllClientSub(client *Client) {
+	topics := client.SubscribeTopic
+	if len(topics) == 0 {
+		return
+	}
+
+	for _, topic := range topics {
+		h.unsubscribe(&Subscribe{Client: client, Destination: topic})
 	}
 }
 
 func (h *Hub) unsubscribe(subscribe *Subscribe) {
 	fmt.Println("A client unsubscribe to: ", subscribe.Destination)
-	clients, ok := h.Topics[subscribe.Destination]
+	client := subscribe.Client
+	destination := subscribe.Destination
+	client.DelSubscribeTopic(destination)
+	clients, ok := h.Topics[destination]
 	if !ok || len(clients) == 0 {
 		return
 	}
 
-	delete(clients, subscribe.Client)
+	delete(clients, client)
 }
 
 func (h *Hub) clientBroadcast(broadcast *ClientBroadcast) {
@@ -77,13 +93,16 @@ func (h *Hub) clientBroadcast(broadcast *ClientBroadcast) {
 
 func (h *Hub) subscribe(subscribe *Subscribe) {
 	fmt.Println("A client subscribe to: ", subscribe.Destination)
-	if clients, ok := h.Topics[subscribe.Destination]; ok {
-		if _, existed := clients[subscribe.Client]; !existed {
-			clients[subscribe.Client] = struct{}{}
+	client := subscribe.Client
+	destination := subscribe.Destination
+	client.AddSubscribeTopic(destination)
+	if clients, ok := h.Topics[destination]; ok {
+		if _, existed := clients[client]; !existed {
+			clients[client] = struct{}{}
 		}
 	} else {
 		clients := make(map[*Client]struct{})
-		clients[subscribe.Client] = struct{}{}
-		h.Topics[subscribe.Destination] = clients
+		clients[client] = struct{}{}
+		h.Topics[destination] = clients
 	}
 }
