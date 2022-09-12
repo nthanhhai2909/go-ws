@@ -1,4 +1,4 @@
-package dto
+package wscore
 
 type Action string
 

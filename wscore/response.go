@@ -1,4 +1,4 @@
-package dto
+package wscore
 
 type WSResponse struct {
 	ID     string `json:"id"`

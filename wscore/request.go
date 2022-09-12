@@ -1,4 +1,4 @@
-package dto
+package wscore
 
 type WSRequest struct {
 	ID      string `json:"id"`

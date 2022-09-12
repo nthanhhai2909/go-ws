@@ -1,11 +1,10 @@
-package handlers
+package wscore
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"mem-ws/wscore/dto"
 	"time"
 )
 
@@ -57,7 +56,7 @@ func (client *Client) DelSubscribeTopic(topic string) {
 	}
 }
 
-func (client *Client) Broadcast(req dto.WSRequest) {
+func (client *Client) Broadcast(req WSRequest) {
 	var payload Broadcast
 	err := json.Unmarshal([]byte(req.Payload), &payload)
 	if err != nil {
@@ -67,13 +66,13 @@ func (client *Client) Broadcast(req dto.WSRequest) {
 	client.Hub.Broadcast <- &payload
 }
 
-func (client *Client) Unsubscribe(req dto.WSRequest) {
+func (client *Client) Unsubscribe(req WSRequest) {
 	payload := req.Payload
 	subscribe := Subscribe{Client: client, Destination: payload}
 	client.Hub.Unsubscribe <- &subscribe
 }
 
-func (client *Client) Subscribe(req dto.WSRequest) {
+func (client *Client) Subscribe(req WSRequest) {
 	payload := req.Payload
 	subscribe := Subscribe{Client: client, Destination: payload}
 	client.Hub.Subscribe <- &subscribe

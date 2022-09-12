@@ -4,17 +4,17 @@ import (
 	"flag"
 	"log"
 	"mem-ws/wscore"
-	"mem-ws/wscore/handlers"
+	"mem-ws/wscore/conf"
 	"net/http"
 )
 
 var addr = flag.String("addr", "localhost:8999", "http service address")
 
 func main() {
-	upgrader := wscore.DefInstance()
-	hub := handlers.NewHub()
-	go hub.Start()
-	wsService := handlers.New(upgrader, hub)
-	http.HandleFunc("/ws", wsService.Handler)
+	defaultConfig := conf.NewDefaultWebsocketConnectionConfiguration()
+	factory, _ := wscore.NewWebSocketConnectionFactory(defaultConfig)
+	container := wscore.NewWSContainer(factory)
+	http.HandleFunc("/ws", container.Handler)
+	container.StartServe()
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

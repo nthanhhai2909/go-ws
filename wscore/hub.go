@@ -1,6 +1,8 @@
-package handlers
+package wscore
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Hub struct {
 	Clients     map[*Client]struct{}
