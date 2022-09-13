@@ -14,7 +14,7 @@ func main() {
 	defaultConfig := conf.NewDefaultWebsocketConnectionConfiguration()
 	factory, _ := wscore.NewWebSocketConnectionFactory(defaultConfig)
 	container := wscore.NewWSContainer(factory)
-	http.HandleFunc("/ws", container.Handler)
 	container.StartServe()
+	http.HandleFunc("/ws", container.Handler)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

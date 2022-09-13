@@ -78,6 +78,10 @@ func (client *Client) Subscribe(req WSRequest) {
 	client.Hub.Subscribe <- &subscribe
 }
 
+func (client *Client) SendToUser(req WSRequest) {
+
+}
+
 func (client *Client) outbound() {
 	fmt.Println("Client outbound started")
 	defer func() {

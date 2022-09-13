@@ -60,6 +60,8 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 			client.Unsubscribe(req)
 		case BROADCAST:
 			client.Broadcast(req)
+		case SEND_TO_USER:
+			client.SendToUser(req)
 		default:
 			fmt.Println("Action do not support")
 		}
