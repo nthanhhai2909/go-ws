@@ -1,4 +1,4 @@
-package wscore
+package core
 
 import (
 	"fmt"

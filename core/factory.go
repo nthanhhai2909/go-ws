@@ -1,9 +1,9 @@
-package wscore
+package core
 
 import (
 	"github.com/gorilla/websocket"
 	"log"
-	"mem-ws/wscore/conf"
+	"mem-ws/core/conf"
 )
 
 type WebsocketConnectionConfigurationError struct {

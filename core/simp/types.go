@@ -1,4 +1,4 @@
-package message
+package simp
 
 type Type string
 
