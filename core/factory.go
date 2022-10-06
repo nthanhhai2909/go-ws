@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/core/conf"
+	"mem-ws/core/wserror"
 )
 
 type WebsocketConnectionConfigurationError struct {
@@ -35,7 +36,7 @@ func (factory *WebsocketConnectionFactory) GetUpgrader() *websocket.Upgrader {
 
 func initWebsocketUpgrader(configuration conf.WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {
 	if configuration.GetReadBufferSize() <= 0 || configuration.GetWriteBufferSize() <= 0 {
-		return nil, conf.InvalidConfigurationError()
+		return nil, wserror.InvalidConfigurationError()
 	}
 
 	upgrader := websocket.Upgrader{

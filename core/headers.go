@@ -1,4 +1,4 @@
-package simp
+package core
 
 const (
 	Destination = "h-destination"

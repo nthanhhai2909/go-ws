@@ -1,33 +1,27 @@
 package simp
 
-import error2 "mem-ws/core/error"
-
-const (
-	IndefiniteTimeout int = -1
+import (
+	"mem-ws/core"
+	"mem-ws/core/channel"
+	"mem-ws/core/converter"
+	"mem-ws/core/wserror"
 )
 
 type SimpleMessageTemplate[T interface{}] struct {
-	MessageChannel Channel[T]
-	Timeout        int64
+	MessageChannel   channel.Channel[T]
+	Timeout          int64
+	MessageConverter converter.MessageConverter[T]
 }
 
-func GetSimpleMessageTemplate[T interface{}](channel Channel[T], timeout int64) *SimpleMessageTemplate[T] {
-	return &SimpleMessageTemplate[T]{
-		MessageChannel: channel,
-		Timeout:        timeout,
-	}
-}
-
-func (template *SimpleMessageTemplate[T]) Send(destination string, msg Message[T]) error {
+func (template *SimpleMessageTemplate[T]) Send(destination string, msg core.Message[T]) error {
 	if destination == "" {
-		return error2.IllegalArgument{Message: "Destination is required"}
+		return wserror.IllegalArgument{Message: "Destination is required"}
 	}
 
 	if msg == nil {
-		return error2.IllegalArgument{Message: "Message is required"}
+		return wserror.IllegalArgument{Message: "Message is required"}
 	}
 
 	msg.GetMessageHeaders().SetDestination(destination)
-	err := template.MessageChannel.Send(msg, template.Timeout)
-	return err
+	return template.MessageChannel.Send(msg, template.Timeout)
 }

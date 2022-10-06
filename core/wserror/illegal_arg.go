@@ -1,4 +1,4 @@
-package error
+package wserror
 
 type IllegalArgument struct {
 	Message string

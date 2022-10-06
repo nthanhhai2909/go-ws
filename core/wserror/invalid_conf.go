@@ -1,4 +1,4 @@
-package conf
+package wserror
 
 const (
 	InvalidConfigurationMessage = "Invalid Configuration"

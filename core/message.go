@@ -1,4 +1,4 @@
-package simp
+package core
 
 type Message[T interface{}] interface {
 	GetPayload() *T
