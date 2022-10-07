@@ -1,9 +1,11 @@
 package converter
 
-import "mem-ws/core"
+import (
+	"mem-ws/core/message"
+)
 
 // MessageConverter TODO HGA: UPDATING
 type MessageConverter[T interface{}] interface {
 	FromMessage()
-	ToMessage() core.Message[T]
+	ToMessage() message.Message[T]
 }

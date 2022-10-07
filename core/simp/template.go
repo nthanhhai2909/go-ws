@@ -1,19 +1,19 @@
 package simp
 
 import (
-	"mem-ws/core"
-	"mem-ws/core/channel"
+	"mem-ws/core/channel/outbound"
 	"mem-ws/core/converter"
+	"mem-ws/core/message"
 	"mem-ws/core/wserror"
 )
 
 type SimpleMessageTemplate[T interface{}] struct {
-	MessageChannel   channel.Channel[T]
+	MessageChannel   outbound.OutboundChannel[T]
 	Timeout          int64
 	MessageConverter converter.MessageConverter[T]
 }
 
-func (template *SimpleMessageTemplate[T]) Send(destination string, msg core.Message[T]) error {
+func (template *SimpleMessageTemplate[T]) Send(destination string, msg message.Message[T]) error {
 	if destination == "" {
 		return wserror.IllegalArgument{Message: "Destination is required"}
 	}
@@ -22,6 +22,6 @@ func (template *SimpleMessageTemplate[T]) Send(destination string, msg core.Mess
 		return wserror.IllegalArgument{Message: "Message is required"}
 	}
 
-	msg.GetMessageHeaders().SetDestination(destination)
+	//msg.GetMessageHeaders().SetDestination(destination)
 	return template.MessageChannel.Send(msg, template.Timeout)
 }

@@ -3,6 +3,7 @@ package core
 import (
 	"github.com/gorilla/websocket"
 	"log"
+	"mem-ws/core/channel/inbound"
 	"mem-ws/core/conf"
 	"mem-ws/core/wserror"
 )
@@ -14,7 +15,8 @@ type WebsocketConnectionConfigurationError struct {
 func (e WebsocketConnectionConfigurationError) Error() string { return e.message }
 
 type WebsocketConnectionFactory struct {
-	upgrader *websocket.Upgrader
+	upgrader       *websocket.Upgrader
+	inboundChannel inbound.InboundChannel[interface{}]
 }
 
 func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
@@ -27,11 +29,17 @@ func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfigu
 
 	return &WebsocketConnectionFactory{
 		upgrader: upgrader,
+		// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
+		inboundChannel: inbound.NewSubscribableChannel(),
 	}, nil
 }
 
 func (factory *WebsocketConnectionFactory) GetUpgrader() *websocket.Upgrader {
 	return factory.upgrader
+}
+
+func (factory *WebsocketConnectionFactory) GetInboundChannel() inbound.InboundChannel[interface{}] {
+	return factory.inboundChannel
 }
 
 func initWebsocketUpgrader(configuration conf.WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {

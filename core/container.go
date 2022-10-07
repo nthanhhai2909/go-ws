@@ -1,31 +1,22 @@
 package core
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 )
 
 type WSContainer interface {
 	Handler(w http.ResponseWriter, r *http.Request)
-	StartServe()
 }
 
 type wscontainer struct {
 	websocketConnectionFactory *WebsocketConnectionFactory
-	hub                        *Hub
 }
 
 func NewWSContainer(websocketConnectionFactory *WebsocketConnectionFactory) WSContainer {
-	hub := NewHub()
 	return &wscontainer{
 		websocketConnectionFactory: websocketConnectionFactory,
-		hub:                        hub,
 	}
-}
-
-func (container *wscontainer) StartServe() {
-	go container.hub.Start()
 }
 
 func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
@@ -35,16 +26,19 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := NewClient(conn, container.hub)
+	handler, err := container.websocketConnectionFactory.GetInboundChannel().Connect(conn)
+	if err != nil {
+		log.Print("Create connection error:", err)
+		return
+	}
+
 	defer func() {
-		err := client.Conn.Close()
-		container.hub.Unregister <- client
+		container.websocketConnectionFactory.GetInboundChannel().Disconnect(handler)
 		if err != nil {
 			log.Println("Error when close connection")
 		}
 	}()
 
-	client.Hub.Register <- client
 	for {
 		var req WSRequest
 		err := conn.ReadJSON(&req)
@@ -53,17 +47,17 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		switch req.Action {
-		case SUBSCRIBE:
-			client.Subscribe(req)
-		case UNSUBSCRIBE:
-			client.Unsubscribe(req)
-		case BROADCAST:
-			client.Broadcast(req)
-		case SEND_TO_USER:
-			client.SendToUser(req)
-		default:
-			fmt.Println("Action do not support")
-		}
+		//switch req.Action {
+		//case SUBSCRIBE:
+		//	client.Subscribe(req)
+		//case UNSUBSCRIBE:
+		//	client.Unsubscribe(req)
+		//case BROADCAST:
+		//	client.Broadcast(req)
+		//case SEND_TO_USER:
+		//	client.SendToUser(req)
+		//default:
+		//	fmt.Println("Action do not support")
+		//}
 	}
 }

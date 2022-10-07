@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"mem-ws/core"
 	"mem-ws/core/conf"
@@ -14,7 +15,7 @@ func main() {
 	defaultConfig := conf.NewDefaultWebsocketConnectionConfiguration()
 	factory, _ := core.NewWebSocketConnectionFactory(defaultConfig)
 	container := core.NewWSContainer(factory)
-	container.StartServe()
 	http.HandleFunc("/ws", container.Handler)
+	fmt.Println("Server start listening at: localhost:8999")
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
