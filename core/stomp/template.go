@@ -1,4 +1,4 @@
-package simp
+package stomp
 
 import (
 	"mem-ws/core/channel/outbound"
@@ -7,13 +7,13 @@ import (
 	"mem-ws/core/wserror"
 )
 
-type SimpleMessageTemplate[T interface{}] struct {
+type MessageTemplate[T interface{}] struct {
 	MessageChannel   outbound.Channel[T]
 	Timeout          int64
 	MessageConverter converter.MessageConverter[T]
 }
 
-func (template *SimpleMessageTemplate[T]) Send(destination string, msg message.Message[T]) error {
+func (template *MessageTemplate[T]) Send(destination string, msg message.Message[T]) error {
 	if destination == "" {
 		return wserror.IllegalArgument{Message: "Destination is required"}
 	}

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -25,23 +26,24 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		log.Print("upgrade:", err)
 		return
 	}
-
-	handler, err := container.websocketConnectionFactory.GetInboundChannel().Connect(conn)
+	inBoundChannel := container.websocketConnectionFactory.GetInboundChannel()
+	handler, err := inBoundChannel.Connect(conn)
 	if err != nil {
 		log.Print("Create connection error:", err)
 		return
 	}
 
 	defer func() {
-		container.websocketConnectionFactory.GetInboundChannel().Disconnect(handler)
+		inBoundChannel.Disconnect(handler)
 		if err != nil {
 			log.Println("Error when close connection")
 		}
 	}()
 
 	for {
-		var req WSRequest
-		err := conn.ReadJSON(&req)
+		messageType, payload, err := conn.ReadMessage()
+		fmt.Println(messageType)
+		fmt.Println(payload)
 		if err != nil {
 			log.Println("Error when read json: ", err)
 			return

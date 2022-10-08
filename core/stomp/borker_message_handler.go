@@ -1,4 +1,4 @@
-package simp
+package stomp
 
 import (
 	"fmt"

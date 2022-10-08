@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"mem-ws/core/message"
-	"mem-ws/core/simp"
-	"mem-ws/core/simp/user"
+	"mem-ws/core/stomp"
+	"mem-ws/core/stomp/user"
 	"mem-ws/core/wserror"
 )
 
@@ -36,13 +36,17 @@ func (chann *subscribableChannel[T]) Connect(conn *websocket.Conn) (message.Hand
 	if conn == nil {
 		return nil, wserror.IllegalArgument{Message: "Connection must not be null"}
 	}
-	handler := simp.NewBrokerMessageHandler(conn)
+	handler := stomp.NewBrokerMessageHandler(conn)
 	chann.ConnectChan <- handler
 	return handler, nil
 }
 
 func (chann *subscribableChannel[T]) Disconnect(handler message.Handler[interface{}]) {
 	chann.DisConnectChan <- handler
+}
+
+func (chann *subscribableChannel[T]) Subscribe(destination string, message message.Handler[T]) error {
+	return nil
 }
 
 func (chann *subscribableChannel[T]) startInternal() {
@@ -75,4 +79,7 @@ func (chann *subscribableChannel[T]) doDisConnectInternal(handler message.Handle
 	if err != nil {
 		fmt.Printf("Error when close connect")
 	}
+}
+
+func (chann *subscribableChannel[T]) doSubscribeInternal() {
 }

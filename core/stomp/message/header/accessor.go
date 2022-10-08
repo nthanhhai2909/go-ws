@@ -1,6 +1,6 @@
 package header
 
-import "mem-ws/core/simp/message"
+import "mem-ws/core/stomp/message"
 
 const (
 	DestinationHeader       = "simpDestination"
