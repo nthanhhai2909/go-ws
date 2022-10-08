@@ -2,27 +2,23 @@ package outbound
 
 import (
 	"mem-ws/core/message"
-	"mem-ws/core/wserror"
 )
 
-type SubscribableChannel[T interface{}] struct {
-	MessageHandler []message.Handler[T]
+type SubscribableChannel[P interface{}, H interface{}] struct {
+	MessageHandler []message.Handler[P, H]
 }
 
-func NewSubscribableChannel(handler []message.Handler[interface{}]) *SubscribableChannel[interface{}] {
-	return &SubscribableChannel[interface{}]{MessageHandler: handler}
+func NewSubscribableChannel(handler []message.Handler[interface{}, interface{}]) *SubscribableChannel[interface{}, interface{}] {
+	return &SubscribableChannel[interface{}, interface{}]{MessageHandler: handler}
 }
 
-func NewSingleSubscribableChannel[T interface{}](handler message.Handler[T]) *SubscribableChannel[T] {
-	handlers := make([]message.Handler[T], 0)
+func NewSingleSubscribableChannel[P interface{}, H interface{}](handler message.Handler[P, H]) *SubscribableChannel[P, H] {
+	handlers := make([]message.Handler[P, H], 0)
 	handlers = append(handlers, handler)
-	return &SubscribableChannel[T]{MessageHandler: handlers}
+	return &SubscribableChannel[P, H]{MessageHandler: handlers}
 }
 
 // Send TODO HGA: CONSIDER TIMEOUT CONSTRAINTS
-func (chann *SubscribableChannel[T]) Send(message message.Message[T], timeout int64) error {
-	if message.GetPayload() == nil {
-		return wserror.IllegalArgument{Message: "Message payload must not be null"}
-	}
+func (chann *SubscribableChannel[P, T]) Send(message message.Message[P, T], timeout int64) error {
 	return nil
 }

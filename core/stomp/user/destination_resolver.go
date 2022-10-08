@@ -4,6 +4,6 @@ import (
 	"mem-ws/core/message"
 )
 
-type DestinationResolver[T interface{}] interface {
-	ResolveDestination(message message.Message[T]) DestinationResult
+type DestinationResolver[P interface{}, T interface{}] interface {
+	ResolveDestination(message message.Message[P, T]) DestinationResult
 }

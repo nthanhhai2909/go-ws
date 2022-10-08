@@ -7,13 +7,13 @@ import (
 	"mem-ws/core/wserror"
 )
 
-type MessageTemplate[T interface{}] struct {
-	MessageChannel   outbound.Channel[T]
+type MessageTemplate[P interface{}, H interface{}] struct {
+	MessageChannel   outbound.Channel[P, H]
 	Timeout          int64
-	MessageConverter converter.MessageConverter[T]
+	MessageConverter converter.MessageConverter[P, H]
 }
 
-func (template *MessageTemplate[T]) Send(destination string, msg message.Message[T]) error {
+func (template *MessageTemplate[P, T]) Send(destination string, msg message.Message[P, T]) error {
 	if destination == "" {
 		return wserror.IllegalArgument{Message: "Destination is required"}
 	}

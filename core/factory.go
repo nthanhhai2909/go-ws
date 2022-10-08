@@ -16,7 +16,7 @@ func (e WebsocketConnectionConfigurationError) Error() string { return e.message
 
 type WebsocketConnectionFactory struct {
 	upgrader       *websocket.Upgrader
-	inboundChannel inbound.Channel[interface{}]
+	inboundChannel inbound.Channel[interface{}, interface{}]
 }
 
 func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
@@ -38,7 +38,7 @@ func (factory *WebsocketConnectionFactory) GetUpgrader() *websocket.Upgrader {
 	return factory.upgrader
 }
 
-func (factory *WebsocketConnectionFactory) GetInboundChannel() inbound.Channel[interface{}] {
+func (factory *WebsocketConnectionFactory) GetInboundChannel() inbound.Channel[interface{}, interface{}] {
 	return factory.inboundChannel
 }
 

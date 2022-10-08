@@ -6,9 +6,10 @@ import (
 )
 
 // Channel TODO HGA WILL ADAPT
-type Channel[T interface{}] interface {
-	Connect(conn *websocket.Conn) (message.Handler[T], error)
-	Disconnect(handler message.Handler[T])
-	Subscribe(destination string, message message.Handler[T]) error
-	//Unsubscribe(destination string, message core.Handler[T]) error
+type Channel[P interface{}, H interface{}] interface {
+	Connect(conn *websocket.Conn) (message.Handler[P, H], error)
+	Disconnect(handler message.Handler[P, H])
+	Subscribe(destination string, message message.Handler[P, H]) error
+	Unsubscribe(destination string, message message.Handler[P, H]) error
+	Send(message message.Message[P, H]) error
 }

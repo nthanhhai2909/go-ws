@@ -1,6 +1,8 @@
 package header
 
-import "mem-ws/core/stomp/message"
+import (
+	"mem-ws/core/stomp"
+)
 
 const (
 	DestinationHeader       = "simpDestination"
@@ -26,12 +28,12 @@ func (accessor *Accessor[interface{}]) GetDestination() string {
 	return accessor.headers[DestinationHeader].(string)
 }
 
-func (accessor *Accessor[interface{}]) SetMessageType(messageType message.MType) {
+func (accessor *Accessor[interface{}]) SetMessageType(messageType stomp.Command) {
 	accessor.headers[MessageTypeHeader] = messageType
 }
 
-func (accessor *Accessor[interface{}]) GetMessageType() message.MType {
-	return accessor.headers[MessageTypeHeader].(message.MType)
+func (accessor *Accessor[interface{}]) GetMessageType() stomp.Command {
+	return accessor.headers[MessageTypeHeader].(stomp.Command)
 }
 
 /*************************************************** Static methods ***************************************************/
@@ -40,6 +42,6 @@ func GetDestination(headers map[string]interface{}) string {
 	return headers[DestinationHeader].(string)
 }
 
-func GetMessageType(headers map[string]interface{}) message.MType {
-	return headers[MessageTypeHeader].(message.MType)
+func GetMessageType(headers map[string]interface{}) stomp.Command {
+	return headers[MessageTypeHeader].(stomp.Command)
 }

@@ -18,7 +18,7 @@ type BrokerMessageHandler[T interface{}] struct {
 	UserID   string
 }
 
-func NewBrokerMessageHandler(conn *websocket.Conn) message.Handler[interface{}] {
+func NewBrokerMessageHandler(conn *websocket.Conn) message.Handler[interface{}, interface{}] {
 	broker := &BrokerMessageHandler[interface{}]{
 		Conn:     conn,
 		Outbound: make(chan []byte),
@@ -27,7 +27,7 @@ func NewBrokerMessageHandler(conn *websocket.Conn) message.Handler[interface{}] 
 	return broker
 }
 
-func (broker BrokerMessageHandler[T]) HandleMessage(msg message.Message[interface{}]) error {
+func (broker BrokerMessageHandler[T]) HandleMessage(msg message.Message[interface{}, interface{}]) error {
 	return nil
 }
 

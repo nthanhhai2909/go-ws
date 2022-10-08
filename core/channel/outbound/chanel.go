@@ -4,6 +4,6 @@ import (
 	"mem-ws/core/message"
 )
 
-type Channel[T interface{}] interface {
-	Send(message message.Message[T], timeout int64) error
+type Channel[P interface{}, H interface{}] interface {
+	Send(message message.Message[P, H], timeout int64) error
 }

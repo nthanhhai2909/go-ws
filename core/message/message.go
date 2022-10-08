@@ -1,6 +1,6 @@
 package message
 
-type Message[T interface{}] interface {
-	GetPayload() *T
-	GetMessageHeaders() *Headers[string, T]
+type Message[P interface{}, H interface{}] interface {
+	GetPayload() P
+	GetMessageHeaders() *Headers[H]
 }

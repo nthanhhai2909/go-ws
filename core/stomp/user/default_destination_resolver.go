@@ -4,10 +4,10 @@ import (
 	"mem-ws/core/message"
 )
 
-type DefaultDestinationResolver[T interface{}] struct {
+type DefaultDestinationResolver[P interface{}, T interface{}] struct {
 }
 
 // ResolveDestination TODO HGA WILL ADAPT LATER
-func (resolver *DefaultDestinationResolver[T]) ResolveDestination(message message.Message[T]) DestinationResult {
+func (resolver *DefaultDestinationResolver[P, T]) ResolveDestination(message message.Message[P, T]) DestinationResult {
 	return DestinationResult{}
 }

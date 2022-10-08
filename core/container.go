@@ -2,7 +2,9 @@ package core
 
 import (
 	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
+	"mem-ws/core/stomp"
 	"net/http"
 )
 
@@ -12,11 +14,13 @@ type WSContainer interface {
 
 type wscontainer struct {
 	websocketConnectionFactory *WebsocketConnectionFactory
+	decoder                    *stomp.Decoder[interface{}, interface{}]
 }
 
 func NewWSContainer(websocketConnectionFactory *WebsocketConnectionFactory) WSContainer {
 	return &wscontainer{
 		websocketConnectionFactory: websocketConnectionFactory,
+		decoder:                    stomp.GetStompDecoder(),
 	}
 }
 
@@ -39,27 +43,16 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Error when close connection")
 		}
 	}()
-
 	for {
 		messageType, payload, err := conn.ReadMessage()
-		fmt.Println(messageType)
-		fmt.Println(payload)
 		if err != nil {
-			log.Println("Error when read json: ", err)
+			fmt.Println("Error when read message")
 			return
 		}
-
-		//switch req.Action {
-		//case SUBSCRIBE:
-		//	client.Subscribe(req)
-		//case UNSUBSCRIBE:
-		//	client.Unsubscribe(req)
-		//case BROADCAST:
-		//	client.Broadcast(req)
-		//case SEND_TO_USER:
-		//	client.SendToUser(req)
-		//default:
-		//	fmt.Println("Action do not support")
-		//}
+		if messageType != websocket.TextMessage {
+			return
+		}
+		message := container.decoder.Decode(payload)
+		fmt.Println(message)
 	}
 }
