@@ -8,7 +8,7 @@ import (
 )
 
 type SimpleMessageTemplate[T interface{}] struct {
-	MessageChannel   outbound.OutboundChannel[T]
+	MessageChannel   outbound.Channel[T]
 	Timeout          int64
 	MessageConverter converter.MessageConverter[T]
 }

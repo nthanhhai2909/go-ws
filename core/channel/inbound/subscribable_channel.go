@@ -22,7 +22,7 @@ type subscribableChannel[T interface{}] struct {
 }
 
 // NewSubscribableChannel The only expose API to get SubscribableChannel instance
-func NewSubscribableChannel() InboundChannel[interface{}] {
+func NewSubscribableChannel() Channel[interface{}] {
 	chann := &subscribableChannel[interface{}]{
 		OutBoundChannels: make(map[string][]message.Handler[interface{}], 0),
 		ConnectChan:      make(chan message.Handler[interface{}]),
