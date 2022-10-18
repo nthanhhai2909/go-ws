@@ -3,15 +3,15 @@ package inbound
 import (
 	"fmt"
 	"github.com/gorilla/websocket"
-	"mem-ws/core/message"
 	"mem-ws/core/stomp"
+	message2 "mem-ws/core/stomp/msg"
 	"mem-ws/core/wserror"
 )
 
 type subscribableChannel[T interface{}] struct {
-	OutBoundChannels map[string][]message.Handler[interface{}, interface{}]
-	ConnectChan      chan message.Handler[interface{}, interface{}]
-	DisConnectChan   chan message.Handler[interface{}, interface{}]
+	OutBoundChannels map[string][]message2.Handler[interface{}]
+	ConnectChan      chan message2.Handler[interface{}]
+	DisConnectChan   chan message2.Handler[interface{}]
 	//	Unregister  chan *core.Client
 	//	Subscribe   chan *core.Subscribe
 	//	Unsubscribe chan *core.Subscribe
@@ -22,15 +22,15 @@ type subscribableChannel[T interface{}] struct {
 // NewSubscribableChannel The only expose API to get SubscribableChannel instance
 func NewSubscribableChannel() Channel[interface{}, interface{}] {
 	chann := &subscribableChannel[interface{}]{
-		OutBoundChannels: make(map[string][]message.Handler[interface{}, interface{}], 0),
-		ConnectChan:      make(chan message.Handler[interface{}, interface{}]),
-		DisConnectChan:   make(chan message.Handler[interface{}, interface{}]),
+		OutBoundChannels: make(map[string][]message2.Handler[interface{}], 0),
+		ConnectChan:      make(chan message2.Handler[interface{}]),
+		DisConnectChan:   make(chan message2.Handler[interface{}]),
 	}
 	go chann.startInternal()
 	return chann
 }
 
-func (chann *subscribableChannel[T]) Connect(conn *websocket.Conn) (message.Handler[interface{}, interface{}], error) {
+func (chann *subscribableChannel[T]) Connect(conn *websocket.Conn) (message2.Handler[interface{}], error) {
 	if conn == nil {
 		return nil, wserror.IllegalArgument{Message: "Connection must not be null"}
 	}
@@ -39,19 +39,19 @@ func (chann *subscribableChannel[T]) Connect(conn *websocket.Conn) (message.Hand
 	return handler, nil
 }
 
-func (chann *subscribableChannel[T]) Disconnect(handler message.Handler[interface{}, interface{}]) {
+func (chann *subscribableChannel[T]) Disconnect(handler message2.Handler[interface{}]) {
 	chann.DisConnectChan <- handler
 }
 
-func (chann *subscribableChannel[T]) Subscribe(destination string, message message.Handler[interface{}, T]) error {
+func (chann *subscribableChannel[T]) Subscribe(destination string, message message2.Handler[T]) error {
 	return nil
 }
 
-func (chann *subscribableChannel[T]) Unsubscribe(destination string, message message.Handler[interface{}, T]) error {
+func (chann *subscribableChannel[T]) Unsubscribe(destination string, message message2.Handler[T]) error {
 	return nil
 }
 
-func (chann *subscribableChannel[T]) Send(message message.Message[interface{}, T]) error {
+func (chann *subscribableChannel[T]) Send(message message2.Message[T]) error {
 	return nil
 }
 
@@ -72,12 +72,12 @@ func (chann *subscribableChannel[T]) startInternal() {
 	}
 }
 
-func (chann *subscribableChannel[T]) doConnectInternal(handler message.Handler[interface{}, interface{}]) {
+func (chann *subscribableChannel[T]) doConnectInternal(handler message2.Handler[interface{}]) {
 	fmt.Printf("New client %s connected", handler.GetUserID())
-	chann.OutBoundChannels[handler.GetUserID()] = []message.Handler[interface{}, interface{}]{handler}
+	chann.OutBoundChannels[handler.GetUserID()] = []message2.Handler[interface{}]{handler}
 }
 
-func (chann *subscribableChannel[T]) doDisConnectInternal(handler message.Handler[interface{}, interface{}]) {
+func (chann *subscribableChannel[T]) doDisConnectInternal(handler message2.Handler[interface{}]) {
 	fmt.Printf("Client %s disconnected", handler.GetUserID())
 	delete(chann.OutBoundChannels, handler.GetUserID())
 	err := handler.GetConn().Close()

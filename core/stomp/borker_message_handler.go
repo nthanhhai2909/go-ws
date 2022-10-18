@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"mem-ws/core/message"
+	message2 "mem-ws/core/stomp/msg"
 	"time"
 )
 
@@ -18,7 +18,7 @@ type BrokerMessageHandler[T interface{}] struct {
 	UserID   string
 }
 
-func NewBrokerMessageHandler(conn *websocket.Conn) message.Handler[interface{}, interface{}] {
+func NewBrokerMessageHandler(conn *websocket.Conn) message2.Handler[interface{}] {
 	broker := &BrokerMessageHandler[interface{}]{
 		Conn:     conn,
 		Outbound: make(chan []byte),
@@ -27,7 +27,7 @@ func NewBrokerMessageHandler(conn *websocket.Conn) message.Handler[interface{}, 
 	return broker
 }
 
-func (broker BrokerMessageHandler[T]) HandleMessage(msg message.Message[interface{}, interface{}]) error {
+func (broker BrokerMessageHandler[T]) HandleMessage(msg message2.Message[interface{}]) error {
 	return nil
 }
 

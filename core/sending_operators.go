@@ -1,7 +1,9 @@
 package core
 
-import "mem-ws/core/message"
+import (
+	"mem-ws/core/stomp/msg"
+)
 
-type SendingOperations[P interface{}, H interface{}] interface {
-	Send(destination string, message message.Message[P, H]) error
+type SendingOperations[P interface{}] interface {
+	Send(destination string, message msg.Message[P]) error
 }

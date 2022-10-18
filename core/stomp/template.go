@@ -3,17 +3,17 @@ package stomp
 import (
 	"mem-ws/core/channel/outbound"
 	"mem-ws/core/converter"
-	"mem-ws/core/message"
+	"mem-ws/core/stomp/msg"
 	"mem-ws/core/wserror"
 )
 
-type MessageTemplate[P interface{}, H interface{}] struct {
-	MessageChannel   outbound.Channel[P, H]
+type MessageTemplate[P interface{}] struct {
+	MessageChannel   outbound.Channel[P]
 	Timeout          int64
-	MessageConverter converter.MessageConverter[P, H]
+	MessageConverter converter.MessageConverter[P]
 }
 
-func (template *MessageTemplate[P, T]) Send(destination string, msg message.Message[P, T]) error {
+func (template *MessageTemplate[P]) Send(destination string, msg msg.Message[P]) error {
 	if destination == "" {
 		return wserror.IllegalArgument{Message: "Destination is required"}
 	}

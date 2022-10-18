@@ -1,9 +1,9 @@
 package user
 
 import (
-	"mem-ws/core/message"
+	"mem-ws/core/stomp/msg"
 )
 
 type DestinationResolver[P interface{}, T interface{}] interface {
-	ResolveDestination(message message.Message[P, T]) DestinationResult
+	ResolveDestination(message msg.Message[P, T]) DestinationResult
 }

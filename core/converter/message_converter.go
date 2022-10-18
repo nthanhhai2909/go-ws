@@ -1,15 +1,16 @@
 package converter
 
 import (
-	"mem-ws/core/message"
+	"mem-ws/core/stomp/header"
+	message2 "mem-ws/core/stomp/msg"
 )
 
 // MessageConverter TODO HGA: UPDATING
-type MessageConverter[P interface{}, H interface{}] interface {
-	FromMessage(msg message.Message[P, H], target H) error
-	ToMessage(payload P, headers message.Headers[H]) (error, message.Message[P, H])
+type MessageConverter[P interface{}] interface {
+	FromMessage(msg message2.Message[P], target P) error
+	ToMessage(payload P, headers header.Headers) (error, message2.Message[P])
 }
 
-func NewStringMessageConverter[P interface{}, T interface{}]() MessageConverter[P, T] {
-	return &stringMessageConverter[P, T]{}
+func NewStringMessageConverter[P interface{}]() MessageConverter[P] {
+	return &stringMessageConverter[P]{}
 }

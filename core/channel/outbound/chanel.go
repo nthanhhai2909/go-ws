@@ -1,9 +1,9 @@
 package outbound
 
 import (
-	"mem-ws/core/message"
+	"mem-ws/core/stomp/msg"
 )
 
-type Channel[P interface{}, H interface{}] interface {
-	Send(message message.Message[P, H], timeout int64) error
+type Channel[P interface{}] interface {
+	Send(message msg.Message[P], timeout int64) error
 }

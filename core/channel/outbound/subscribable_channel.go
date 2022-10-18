@@ -1,24 +1,24 @@
 package outbound
 
 import (
-	"mem-ws/core/message"
+	message2 "mem-ws/core/stomp/msg"
 )
 
-type SubscribableChannel[P interface{}, H interface{}] struct {
-	MessageHandler []message.Handler[P, H]
+type SubscribableChannel[P interface{}] struct {
+	MessageHandler []message2.Handler[P]
 }
 
-func NewSubscribableChannel(handler []message.Handler[interface{}, interface{}]) *SubscribableChannel[interface{}, interface{}] {
-	return &SubscribableChannel[interface{}, interface{}]{MessageHandler: handler}
+func NewSubscribableChannel(handler []message2.Handler[interface{}]) *SubscribableChannel[interface{}] {
+	return &SubscribableChannel[interface{}]{MessageHandler: handler}
 }
 
-func NewSingleSubscribableChannel[P interface{}, H interface{}](handler message.Handler[P, H]) *SubscribableChannel[P, H] {
-	handlers := make([]message.Handler[P, H], 0)
+func NewSingleSubscribableChannel[P interface{}](handler message2.Handler[P]) *SubscribableChannel[P] {
+	handlers := make([]message2.Handler[P], 0)
 	handlers = append(handlers, handler)
-	return &SubscribableChannel[P, H]{MessageHandler: handlers}
+	return &SubscribableChannel[P]{MessageHandler: handlers}
 }
 
 // Send TODO HGA: CONSIDER TIMEOUT CONSTRAINTS
-func (chann *SubscribableChannel[P, T]) Send(message message.Message[P, T], timeout int64) error {
+func (chann *SubscribableChannel[P]) Send(message message2.Message[P], timeout int64) error {
 	return nil
 }

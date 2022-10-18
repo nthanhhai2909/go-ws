@@ -14,7 +14,7 @@ type WSContainer interface {
 
 type wscontainer struct {
 	websocketConnectionFactory *WebsocketConnectionFactory
-	decoder                    *stomp.Decoder[interface{}, interface{}]
+	decoder                    *stomp.Decoder
 }
 
 func NewWSContainer(websocketConnectionFactory *WebsocketConnectionFactory) WSContainer {
@@ -46,13 +46,13 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		messageType, payload, err := conn.ReadMessage()
 		if err != nil {
-			fmt.Println("Error when read message")
+			fmt.Println("Error when read msg")
 			return
 		}
 		if messageType != websocket.TextMessage {
 			return
 		}
-		message := container.decoder.Decode(payload)
+		message, _ := container.decoder.Decode(payload)
 		fmt.Println(message)
 	}
 }

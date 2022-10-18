@@ -1,16 +1,17 @@
 package converter
 
 import (
-	"mem-ws/core/message"
+	"mem-ws/core/stomp/header"
+	message2 "mem-ws/core/stomp/msg"
 )
 
-type stringMessageConverter[P interface{}, T interface{}] struct {
+type stringMessageConverter[P interface{}] struct {
 }
 
-func (converter *stringMessageConverter[P, T]) FromMessage(msg message.Message[P, T], target T) error {
+func (converter *stringMessageConverter[P]) FromMessage(msg message2.Message[P], target P) error {
 	return nil
 }
 
-func (converter *stringMessageConverter[P, T]) ToMessage(payload P, headers message.Headers[T]) (error, message.Message[P, T]) {
+func (converter *stringMessageConverter[P]) ToMessage(payload P, headers header.Headers) (error, message2.Message[P]) {
 	return nil, nil
 }

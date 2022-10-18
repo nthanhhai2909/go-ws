@@ -1,15 +1,15 @@
-package message
+package header
 
 const (
 	StompIdHeader            = "id"
 	StompHostHeader          = "host"
 	StompAcceptVersionHeader = "accept-version"
-	StompMessageIdHeader     = "message-id"
+	StompMessageIdHeader     = "msg-id"
 	StompReceiptHeader       = "receipt"
 	StompReceiptIdHeader     = "receipt-id"
 	StompSubscriptionHeader  = "subscription"
 	StompVersionHeader       = "version"
-	StompMessageHeader       = "message"
+	StompMessageHeader       = "msg"
 	StompAckHeader           = "ack"
 	StompNackHeader          = "nack"
 	StompLoginHeader         = "login"
@@ -22,14 +22,26 @@ const (
 	CredentialsHeader        = "stompCredentials"
 )
 
-type Headers[V interface{}] struct {
-	headers map[string]V
+type Headers struct {
+	headers map[string]interface{}
 }
 
-func (h *Headers[V]) SetDestination(destination V) {
+func NewHeader() *Headers {
+	return &Headers{headers: make(map[string]interface{}, 0)}
+}
+func (h *Headers) SetDestination(destination interface{}) {
 	h.headers[StompDestinationHeader] = destination
 }
 
-func (h *Headers[V]) SetContentType(contentType V) {
+func (h *Headers) SetContentType(contentType interface{}) {
 	h.headers[StompContentTypeHeader] = contentType
+}
+
+func (h *Headers) SetCommand(cmd interface{}) {
+	h.headers[CommandHeader] = cmd
+}
+
+func (h *Headers) SetHeader(key string, value interface{}) {
+	// TODO HGA WILL CHECK KEY VALUE IN RANGE
+	h.headers[key] = value
 }
