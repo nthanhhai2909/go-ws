@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/core/stomp"
@@ -31,7 +30,7 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	inBoundChannel := container.websocketConnectionFactory.GetInboundChannel()
-	handler, err := inBoundChannel.Connect(conn)
+	handler, err := inBoundChannel.Send(conn)
 	if err != nil {
 		log.Print("Create connection error:", err)
 		return
@@ -46,13 +45,17 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		messageType, payload, err := conn.ReadMessage()
 		if err != nil {
-			fmt.Println("Error when read msg")
+			log.Println("Error when read msg")
 			return
 		}
 		if messageType != websocket.TextMessage {
 			return
 		}
 		message, _ := container.decoder.Decode(payload)
-		fmt.Println(message)
+		err = inBoundChannel.Send(message)
+		if err != nil {
+			log.Println("Error when send msg")
+			return
+		}
 	}
 }

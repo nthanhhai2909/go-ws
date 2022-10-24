@@ -41,6 +41,10 @@ func (h *Headers) SetCommand(cmd interface{}) {
 	h.headers[CommandHeader] = cmd
 }
 
+func (h *Headers) GetCommand() string {
+	return h.headers[CommandHeader].(string)
+}
+
 func (h *Headers) SetHeader(key string, value interface{}) {
 	// TODO HGA WILL CHECK KEY VALUE IN RANGE
 	h.headers[key] = value

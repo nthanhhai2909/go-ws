@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	message2 "mem-ws/core/stomp/msg"
+	"mem-ws/core/stomp/msg"
 	"time"
 )
 
@@ -12,14 +12,14 @@ const (
 	writeWait = 10 * time.Second
 )
 
-type BrokerMessageHandler[T interface{}] struct {
+type BrokerMessageHandler[T []byte] struct {
 	Conn     *websocket.Conn
-	Outbound chan []byte
+	Outbound chan T
 	UserID   string
 }
 
-func NewBrokerMessageHandler(conn *websocket.Conn) message2.Handler[interface{}] {
-	broker := &BrokerMessageHandler[interface{}]{
+func NewBrokerMessageHandler(conn *websocket.Conn) msg.Handler[[]byte] {
+	broker := &BrokerMessageHandler[[]byte]{
 		Conn:     conn,
 		Outbound: make(chan []byte),
 		UserID:   uuid.New().String(),
@@ -27,7 +27,7 @@ func NewBrokerMessageHandler(conn *websocket.Conn) message2.Handler[interface{}]
 	return broker
 }
 
-func (broker BrokerMessageHandler[T]) HandleMessage(msg message2.Message[interface{}]) error {
+func (broker BrokerMessageHandler[T]) HandleMessage(msg msg.Message[T]) error {
 	return nil
 }
 
@@ -39,7 +39,7 @@ func (broker BrokerMessageHandler[T]) GetConn() *websocket.Conn {
 	return broker.Conn
 }
 
-func (broker BrokerMessageHandler[T]) GetOutboundChannel() chan []byte {
+func (broker BrokerMessageHandler[T]) GetOutboundChannel() chan T {
 	return broker.Outbound
 }
 

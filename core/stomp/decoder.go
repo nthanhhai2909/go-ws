@@ -17,6 +17,7 @@ func GetStompDecoder() *Decoder {
 	return &Decoder{}
 }
 
+// TODO HGA WILL PROCESS FOR ERROR MESSAGE
 func (d *Decoder) Decode(buff []byte) (msg.Message[[]byte], error) {
 	buffer := bytes.NewBuffer(buff)
 	command, err := d.readCommand(buffer)
