@@ -1,14 +1,14 @@
 package stomp
 
 import (
-	"mem-ws/socket/channel/outbound"
+	"mem-ws/socket/channel"
 	"mem-ws/socket/converter"
 	"mem-ws/socket/stomp/msg"
 	"mem-ws/socket/wserror"
 )
 
 type MessageTemplate[P interface{}] struct {
-	MessageChannel   outbound.Channel[P]
+	MessageChannel   channel.Channel
 	Timeout          int64
 	MessageConverter converter.MessageConverter[P]
 }
@@ -23,5 +23,6 @@ func (template *MessageTemplate[P]) Send(destination string, msg msg.Message[P])
 	}
 
 	//msg.GetMessageHeaders().SetDestination(destination)
-	return template.MessageChannel.Send(msg, template.Timeout)
+	//return template.MessageChannel.Send(msg, template.Timeout)
+	return nil
 }

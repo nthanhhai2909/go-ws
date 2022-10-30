@@ -3,8 +3,9 @@ package socket
 import (
 	"github.com/gorilla/websocket"
 	"log"
-	"mem-ws/socket/channel/inbound"
+	"mem-ws/socket/channel"
 	"mem-ws/socket/conf"
+	"mem-ws/socket/stomp"
 	"mem-ws/socket/wserror"
 )
 
@@ -15,8 +16,8 @@ type WebsocketConnectionConfigurationError struct {
 func (e WebsocketConnectionConfigurationError) Error() string { return e.message }
 
 type WebsocketConnectionFactory struct {
-	upgrader       *websocket.Upgrader
-	inboundChannel inbound.Channel[[]byte]
+	upgrader                    *websocket.Upgrader
+	subProtocolWebsocketHandler WebsocketHandler
 }
 
 func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
@@ -26,11 +27,15 @@ func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfigu
 		log.Panic("Invalid UpgradeConfiguration")
 		return nil, err
 	}
-
+	// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
 	return &WebsocketConnectionFactory{
+		subProtocolWebsocketHandler: &SubProtocolWebsocketHandler{
+			ClientInboundChannel: channel.NewSubscribableChannel(),
+			Sessions:             make(map[string]WebsocketSession),
+			// TODO INIT BASED ON CONFIGURATION
+			SubProtocolHandler: &stomp.SubProtocolHandler{},
+		},
 		upgrader: upgrader,
-		// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
-		inboundChannel: inbound.NewSubscribableChannel(),
 	}, nil
 }
 
@@ -38,8 +43,8 @@ func (factory *WebsocketConnectionFactory) GetUpgrader() *websocket.Upgrader {
 	return factory.upgrader
 }
 
-func (factory *WebsocketConnectionFactory) GetInboundChannel() inbound.Channel[[]byte] {
-	return factory.inboundChannel
+func (factory *WebsocketConnectionFactory) GetSubProtocolWebsocketHandler() WebsocketHandler {
+	return factory.subProtocolWebsocketHandler
 }
 
 func initWebsocketUpgrader(configuration conf.WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {

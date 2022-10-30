@@ -1,9 +1,18 @@
 package socket
 
-import "github.com/gorilla/websocket"
+import (
+	"mem-ws/socket/channel"
+	"mem-ws/socket/stomp/msg"
+)
 
 type SubProtocolHandler interface {
+
+	// SupportProtocols - Get protocol supports list
 	SupportProtocols() []string
 
-	HandlerMessageFromClient(conn *websocket.Conn)
+	// HandleMessageFromClient channel is InboundChannel which process message from client
+	HandleMessageFromClient(session WebsocketSession, message msg.Message[[]byte], channel channel.Channel)
+
+	// SendMessageToClient - Send message to client
+	SendMessageToClient(session WebsocketSession, message msg.Message[[]byte])
 }

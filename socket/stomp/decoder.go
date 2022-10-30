@@ -2,8 +2,8 @@ package stomp
 
 import (
 	"bytes"
+	"mem-ws/socket/header"
 	"mem-ws/socket/stomp/cmd"
-	"mem-ws/socket/stomp/header"
 	"mem-ws/socket/stomp/msg"
 	"mem-ws/socket/wserror"
 	"strings"

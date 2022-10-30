@@ -1,4 +1,4 @@
-package inbound
+package channel
 
 import (
 	"mem-ws/socket/stomp/cmd"
@@ -7,12 +7,12 @@ import (
 )
 
 type SubscribableChannel struct {
-	Handlers map[msg.Handler[[]byte]]struct{}
+	Handlers map[msg.Handler]struct{}
 }
 
-func NewSubscribableChannel() Channel[[]byte] {
+func NewSubscribableChannel() Channel {
 	chann := &SubscribableChannel{
-		Handlers: make(map[msg.Handler[[]byte]]struct{}, 0),
+		Handlers: make(map[msg.Handler]struct{}, 0),
 	}
 	go chann.startInternal()
 	return chann
@@ -31,15 +31,15 @@ func NewSubscribableChannel() Channel[[]byte] {
 //	chann.DisConnectChan <- handler
 //}
 
-func (chann *SubscribableChannel) Subscribe(handler msg.Handler[[]byte]) error {
+func (chann *SubscribableChannel) Subscribe(handler msg.Handler) error {
 	return nil
 }
 
-func (chann *SubscribableChannel) Unsubscribe(handler msg.Handler[[]byte]) error {
+func (chann *SubscribableChannel) Unsubscribe(handler msg.Handler) error {
 	return nil
 }
 
-func (chann *SubscribableChannel) Send(message msg.Message[[]byte]) error {
+func (chann *SubscribableChannel) Send(message msg.Message[interface{}]) error {
 	if message == nil {
 		return wserror.IllegalArgument{Message: "Message must not be null"}
 	}
@@ -68,12 +68,12 @@ func (chann *SubscribableChannel) startInternal() {
 	}
 }
 
-func (chann *SubscribableChannel) doConnectInternal(handler msg.Handler[[]byte]) {
+func (chann *SubscribableChannel) doConnectInternal(handler msg.Handler) {
 	//fmt.Printf("New client %s connected", handler.GetUserID())
 	//chann.OutBoundChannels[handler.GetUserID()] = []msg.Handler[[]byte]{handler}
 }
 
-func (chann *SubscribableChannel) doDisConnectInternal(handler msg.Handler[[]byte]) {
+func (chann *SubscribableChannel) doDisConnectInternal(handler msg.Handler) {
 	//fmt.Printf("Client %s disconnected", handler.GetUserID())
 	//delete(chann.OutBoundChannels, handler.GetUserID())
 	//err := handler.GetConn().Close()

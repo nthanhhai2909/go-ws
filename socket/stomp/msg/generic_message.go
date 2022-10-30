@@ -1,6 +1,8 @@
 package msg
 
-import "mem-ws/socket/stomp/header"
+import (
+	"mem-ws/socket/header"
+)
 
 type GenericMessage[P interface{}] struct {
 	Payload P
