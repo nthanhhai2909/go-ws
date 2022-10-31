@@ -2,6 +2,7 @@ package socket
 
 import (
 	"mem-ws/socket/channel"
+	"mem-ws/socket/message"
 	"mem-ws/socket/stomp/msg"
 )
 
@@ -11,7 +12,7 @@ type SubProtocolHandler interface {
 	SupportProtocols() []string
 
 	// HandleMessageFromClient channel is InboundChannel which process message from client
-	HandleMessageFromClient(session WebsocketSession, message msg.Message[[]byte], channel channel.Channel)
+	HandleMessageFromClient(session WebsocketSession, message message.WebsocketMessage[[]byte], channel channel.Channel)
 
 	// SendMessageToClient - Send message to client
 	SendMessageToClient(session WebsocketSession, message msg.Message[[]byte])

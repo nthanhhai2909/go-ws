@@ -1,8 +1,9 @@
-package socket
+package provider
 
 import (
 	"github.com/gorilla/websocket"
 	"log"
+	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
 	"mem-ws/socket/message"
 	"net/http"
@@ -39,7 +40,7 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		// TODO HGA WILL PROCESS CLOSE STATUS LATER
-		websocketHandler.AfterConnectionClosed(websocketSession, Normal)
+		err = websocketHandler.AfterConnectionClosed(websocketSession, socket.Normal)
 		if err != nil {
 			log.Println("Error when close connection")
 		}
