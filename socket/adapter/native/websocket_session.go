@@ -4,17 +4,11 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"log"
-	"mem-ws/socket/socketmsg"
+	"mem-ws/socket"
 	"net/http"
-	"time"
 )
 
-const (
-	writeWait = 10 * time.Second
-)
-
-// WebsocketSession Implementation
-type webSocketSession struct {
+type WebsocketSession struct {
 	id               string
 	acceptedProtocol string
 	conn             *websocket.Conn
@@ -23,8 +17,8 @@ type webSocketSession struct {
 	binarySize       int
 }
 
-func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *webSocketSession {
-	session := &webSocketSession{
+func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *WebsocketSession {
+	session := &WebsocketSession{
 		conn:             conn,
 		outbound:         make(chan []byte),
 		id:               uuid.New().String(),
@@ -37,57 +31,57 @@ func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *we
 	return session
 }
 
-func (session *webSocketSession) GetID() string {
+func (session *WebsocketSession) GetID() string {
 	return session.id
 }
 
-func (session *webSocketSession) GetHandshakeHeaders() http.Header {
+func (session *WebsocketSession) GetHandshakeHeaders() http.Header {
 	return nil
 }
 
-func (session *webSocketSession) GetRemoteAddress() {
+func (session *WebsocketSession) GetRemoteAddress() {
 }
 
-func (session *webSocketSession) GetLocalAddress() {
+func (session *WebsocketSession) GetLocalAddress() {
 }
 
-func (session *webSocketSession) GetAcceptedProtocol() string {
+func (session *WebsocketSession) GetAcceptedProtocol() string {
 	return session.acceptedProtocol
 }
 
-func (session *webSocketSession) SetTextMessageSizeLimit(size int) {
+func (session *WebsocketSession) SetTextMessageSizeLimit(size int) {
 	session.textSize = size
 }
 
-func (session *webSocketSession) GetTextMessageSizeLimit() int {
+func (session *WebsocketSession) GetTextMessageSizeLimit() int {
 	return session.textSize
 }
 
-func (session *webSocketSession) SetBinaryMessageSizeLimit(size int) {
+func (session *WebsocketSession) SetBinaryMessageSizeLimit(size int) {
 	session.binarySize = size
 }
 
-func (session *webSocketSession) GetBinaryMessageSizeLimit() int {
+func (session *WebsocketSession) GetBinaryMessageSizeLimit() int {
 	return session.binarySize
 }
 
-func (session *webSocketSession) GetExtensions() {
+func (session *WebsocketSession) GetExtensions() {
 }
 
-func (session *webSocketSession) SendMessage(message socketmsg.WebsocketMessage[[]byte]) {
+func (session *WebsocketSession) SendMessage(message socket.WebsocketMessage[[]byte]) {
 	session.outbound <- message.GetPayload()
 }
 
-func (session *webSocketSession) IsOpen() bool {
+func (session *WebsocketSession) IsOpen() bool {
 	return false
 }
 
-func (session *webSocketSession) Close() error {
+func (session *WebsocketSession) Close() error {
 	err := session.conn.Close()
 	return err
 }
 
-func (session *webSocketSession) startInternal() {
+func (session *WebsocketSession) startInternal() {
 
 	conn := session.conn
 	defer func() {

@@ -21,7 +21,7 @@ var GoingAway = CloseStatus{Code: 1001, Reason: stringutils.EMPTY}
 var ProtocolError = CloseStatus{Code: 1002, Reason: stringutils.EMPTY}
 
 // NotAcceptable - Code 1003 indicates that an endpoint is terminating the connection because it has received a type of data
-// it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary socketmsg).
+// it cannot accept (e.g., an endpoint that understands only text data MAY send this if it receives a binary stompmsg).
 var NotAcceptable = CloseStatus{Code: 1003, Reason: stringutils.EMPTY}
 
 // NoStatusCode - Code 1004 is a reserved value and MUST NOT be set as a status code in a Close control frame by an endpoint.

@@ -1,10 +1,10 @@
 package socket
 
 import (
-	"mem-ws/socket/socketmsg"
 	"net/http"
 )
 
+// IWebsocketSession refer to a native Websocket Session established between client-server
 type IWebsocketSession interface {
 	GetID() string
 	GetHandshakeHeaders() http.Header
@@ -16,7 +16,7 @@ type IWebsocketSession interface {
 	SetBinaryMessageSizeLimit(size int)
 	GetBinaryMessageSizeLimit() int
 	GetExtensions()
-	SendMessage(message socketmsg.WebsocketMessage[[]byte])
+	SendMessage(message WebsocketMessage[[]byte])
 	IsOpen() bool
 	Close() error
 }
