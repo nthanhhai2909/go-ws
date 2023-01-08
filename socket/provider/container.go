@@ -5,7 +5,7 @@ import (
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
-	"mem-ws/socket/message"
+	"mem-ws/socket/socketmsg"
 	"net/http"
 )
 
@@ -48,17 +48,17 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 	for {
 		messageType, payload, err := conn.ReadMessage()
 		if err != nil {
-			log.Println("Error when send msg")
+			log.Println("container: Error when send socketmsg")
 			return
 		}
-		websocketMessage := message.ToWebsocketMessage(messageType, payload)
+		websocketMessage := socketmsg.ToWebsocketMessage(messageType, payload)
 		// TODO HGA WILL CHECK MESSAGE TYPE
 		if messageType != websocket.TextMessage {
 			return
 		}
 		err = websocketHandler.HandleMessageFromClient(websocketSession, websocketMessage)
 		if err != nil {
-			log.Println("Error when send msg")
+			log.Println("Error when send socketmsg")
 			return
 		}
 	}

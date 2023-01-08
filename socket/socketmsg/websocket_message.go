@@ -1,4 +1,4 @@
-package message
+package socketmsg
 
 import "github.com/gorilla/websocket"
 

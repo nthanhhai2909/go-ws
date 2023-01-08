@@ -6,6 +6,7 @@ import (
 	"mem-ws/socket"
 	"mem-ws/socket/channel"
 	"mem-ws/socket/conf"
+	"mem-ws/socket/stomp"
 	"mem-ws/socket/wserror"
 )
 
@@ -17,7 +18,7 @@ func (e WebsocketConnectionConfigurationError) Error() string { return e.message
 
 type WebsocketConnectionFactory struct {
 	upgrader                    *websocket.Upgrader
-	subProtocolWebsocketHandler socket.WebsocketHandler
+	subProtocolWebsocketHandler socket.IWebsocketHandler
 }
 
 func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
@@ -31,9 +32,8 @@ func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfigu
 	return &WebsocketConnectionFactory{
 		subProtocolWebsocketHandler: &socket.SubProtocolWebsocketHandler{
 			ClientInboundChannel: channel.NewSubscribableChannel(),
-			Sessions:             make(map[string]socket.WebsocketSession),
-			// TODO INIT BASED ON CONFIGURATION
-			//SubProtocolHandler: &stomp.SubProtocolHandler{},
+			Sessions:             make(map[string]socket.IWebsocketSession),
+			SubProtocolHandler:   stomp.NewProtocolHandler(),
 		},
 		upgrader: upgrader,
 	}, nil
@@ -43,7 +43,7 @@ func (factory *WebsocketConnectionFactory) GetUpgrader() *websocket.Upgrader {
 	return factory.upgrader
 }
 
-func (factory *WebsocketConnectionFactory) GetSubProtocolWebsocketHandler() socket.WebsocketHandler {
+func (factory *WebsocketConnectionFactory) GetSubProtocolWebsocketHandler() socket.IWebsocketHandler {
 	return factory.subProtocolWebsocketHandler
 }
 

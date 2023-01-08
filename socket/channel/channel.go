@@ -1,9 +1,9 @@
 package channel
 
-import "mem-ws/socket/stomp/msg"
+import "mem-ws/socket/stomp/stompmsg"
 
 type Channel interface {
-	Subscribe(handler msg.Handler) error
-	Unsubscribe(handler msg.Handler) error
-	Send(message msg.Message[interface{}]) error
+	Subscribe(handler stompmsg.Handler) error
+	Unsubscribe(handler stompmsg.Handler) error
+	Send(message stompmsg.Message[interface{}]) error
 }

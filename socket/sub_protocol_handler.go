@@ -2,18 +2,18 @@ package socket
 
 import (
 	"mem-ws/socket/channel"
-	"mem-ws/socket/message"
-	"mem-ws/socket/stomp/msg"
+	"mem-ws/socket/socketmsg"
+	"mem-ws/socket/stomp/stompmsg"
 )
 
-type SubProtocolHandler interface {
+type ISubProtocolHandler interface {
 
 	// SupportProtocols - Get protocol supports list
 	SupportProtocols() []string
 
-	// HandleMessageFromClient channel is InboundChannel which process message from client
-	HandleMessageFromClient(session WebsocketSession, message message.WebsocketMessage[[]byte], channel channel.Channel)
+	// HandleMessageFromClient channel is InboundChannel which process socketmsg from client
+	HandleMessageFromClient(session IWebsocketSession, message socketmsg.WebsocketMessage[[]byte], channel channel.Channel)
 
-	// SendMessageToClient - Send message to client
-	SendMessageToClient(session WebsocketSession, message msg.Message[[]byte])
+	// SendMessageToClient - Send socketmsg to client
+	SendMessageToClient(session IWebsocketSession, message stompmsg.Message[[]byte])
 }

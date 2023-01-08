@@ -4,12 +4,12 @@ const (
 	StompIdHeader            = "id"
 	StompHostHeader          = "host"
 	StompAcceptVersionHeader = "accept-version"
-	StompMessageIdHeader     = "msg-id"
+	StompMessageIdHeader     = "socketmsg-id"
 	StompReceiptHeader       = "receipt"
 	StompReceiptIdHeader     = "receipt-id"
 	StompSubscriptionHeader  = "subscription"
 	StompVersionHeader       = "version"
-	StompMessageHeader       = "msg"
+	StompMessageHeader       = "socketmsg"
 	StompAckHeader           = "ack"
 	StompNackHeader          = "nack"
 	StompLoginHeader         = "login"
@@ -23,29 +23,22 @@ const (
 )
 
 type Headers struct {
-	headers map[string]interface{}
+	headers map[string]string
 }
 
 func NewHeader() *Headers {
-	return &Headers{headers: make(map[string]interface{}, 0)}
-}
-func (h *Headers) SetDestination(destination interface{}) {
-	h.headers[StompDestinationHeader] = destination
+	return &Headers{headers: make(map[string]string, 0)}
 }
 
-func (h *Headers) SetContentType(contentType interface{}) {
-	h.headers[StompContentTypeHeader] = contentType
-}
-
-func (h *Headers) SetCommand(cmd interface{}) {
-	h.headers[CommandHeader] = cmd
-}
-
-func (h *Headers) GetCommand() string {
-	return h.headers[CommandHeader].(string)
-}
-
-func (h *Headers) SetHeader(key string, value interface{}) {
+func (h *Headers) SetHeader(key string, value string) {
 	// TODO HGA WILL CHECK KEY VALUE IN RANGE
 	h.headers[key] = value
+}
+
+func (h *Headers) GetHeader(key string) string {
+	return h.headers[key]
+}
+
+func (h *Headers) GetHeaderProperties() map[string]string {
+	return h.headers
 }

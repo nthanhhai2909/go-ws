@@ -1,7 +1,7 @@
 package user
 
-import "mem-ws/socket/stomp/msg"
+import "mem-ws/socket/stomp/stompmsg"
 
 type DestinationResolver[P interface{}] interface {
-	ResolveDestination(message msg.Message[P]) DestinationResult
+	ResolveDestination(message stompmsg.Message[P]) DestinationResult
 }

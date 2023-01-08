@@ -3,8 +3,8 @@ package stomp
 import (
 	"bytes"
 	"mem-ws/socket/header"
-	"mem-ws/socket/stomp/cmd"
-	"mem-ws/socket/stomp/msg"
+	"mem-ws/socket/stomp/cmd/client"
+	"mem-ws/socket/stomp/stompmsg"
 	"mem-ws/socket/wserror"
 	"strings"
 )
@@ -18,7 +18,7 @@ func GetStompDecoder() *Decoder {
 }
 
 // TODO HGA WILL PROCESS FOR ERROR MESSAGE
-func (d *Decoder) Decode(buff []byte) (msg.Message[[]byte], error) {
+func (d *Decoder) Decode(buff []byte) (stompmsg.Message[[]byte], error) {
 	buffer := bytes.NewBuffer(buff)
 	command, err := d.readCommand(buffer)
 	if err != nil {
@@ -28,18 +28,18 @@ func (d *Decoder) Decode(buff []byte) (msg.Message[[]byte], error) {
 	if err != nil {
 		return nil, err
 	}
-	headers.SetCommand(command)
+	headers.SetHeader(header.CommandHeader, command.Type)
 	payload, err := d.readPayload(buffer)
 	if err != nil {
 		return nil, err
 	}
-	return &msg.GenericMessage[[]byte]{
+	return &stompmsg.GenericMessage[[]byte]{
 		Headers: headers,
 		Payload: payload,
 	}, nil
 }
 
-func (d *Decoder) readCommand(buffer *bytes.Buffer) (*cmd.Command, error) {
+func (d *Decoder) readCommand(buffer *bytes.Buffer) (*client.Command, error) {
 	comm := bytes.NewBuffer(make([]byte, 0))
 	for {
 		isEndLine, err := d.tryToGetEndOfLine(buffer)
@@ -54,7 +54,7 @@ func (d *Decoder) readCommand(buffer *bytes.Buffer) (*cmd.Command, error) {
 		ch, _, _ := buffer.ReadRune()
 		comm.WriteRune(ch)
 	}
-	return cmd.ToCommand(comm.String()), nil
+	return client.ToCommand(comm.String()), nil
 }
 
 func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {

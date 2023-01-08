@@ -1,4 +1,4 @@
-package message
+package socketmsg
 
 type PongMessage struct {
 	bytes []byte

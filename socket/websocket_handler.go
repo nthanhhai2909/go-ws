@@ -1,13 +1,13 @@
 package socket
 
 import (
-	"mem-ws/socket/message"
+	"mem-ws/socket/socketmsg"
 )
 
-type WebsocketHandler interface {
-	AfterConnectionEstablished(session WebsocketSession) error
-	HandleMessageFromClient(session WebsocketSession, message message.WebsocketMessage[[]byte]) error
-	HandleTransportError(session WebsocketSession, err error) error
-	AfterConnectionClosed(session WebsocketSession, status CloseStatus) error
+type IWebsocketHandler interface {
+	AfterConnectionEstablished(session IWebsocketSession) error
+	HandleMessageFromClient(session IWebsocketSession, message socketmsg.WebsocketMessage[[]byte]) error
+	HandleTransportError(session IWebsocketSession, err error) error
+	AfterConnectionClosed(session IWebsocketSession, status CloseStatus) error
 	SupportsPartialMessages() bool
 }

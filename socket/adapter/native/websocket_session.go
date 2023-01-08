@@ -3,7 +3,8 @@ package native
 import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-	"mem-ws/socket/message"
+	"log"
+	"mem-ws/socket/socketmsg"
 	"net/http"
 	"time"
 )
@@ -23,7 +24,7 @@ type webSocketSession struct {
 }
 
 func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *webSocketSession {
-	return &webSocketSession{
+	session := &webSocketSession{
 		conn:             conn,
 		outbound:         make(chan []byte),
 		id:               uuid.New().String(),
@@ -31,6 +32,9 @@ func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *we
 		textSize:         textSize,
 		binarySize:       binarySize,
 	}
+
+	go session.startInternal()
+	return session
 }
 
 func (session *webSocketSession) GetID() string {
@@ -70,7 +74,7 @@ func (session *webSocketSession) GetBinaryMessageSizeLimit() int {
 func (session *webSocketSession) GetExtensions() {
 }
 
-func (session *webSocketSession) SendMessage(message message.WebsocketMessage[[]byte]) {
+func (session *webSocketSession) SendMessage(message socketmsg.WebsocketMessage[[]byte]) {
 	session.outbound <- message.GetPayload()
 }
 
@@ -83,8 +87,9 @@ func (session *webSocketSession) Close() error {
 	return err
 }
 
-func (session *webSocketSession) listen() {
+func (session *webSocketSession) startInternal() {
 
+	conn := session.conn
 	defer func() {
 		err := session.conn.Close()
 		if err != nil {
@@ -95,30 +100,16 @@ func (session *webSocketSession) listen() {
 	for {
 		select {
 		case payload, ok := <-session.outbound:
-			err := session.conn.SetWriteDeadline(time.Now().Add(writeWait))
-			if err != nil {
-				// TODO HGA WILL ADAPT LATER
-			}
-
+			//conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
-				err = session.conn.WriteMessage(websocket.CloseMessage, []byte{})
-				if err != nil {
-					// TODO HGA WILL ADAPT LATER
-				}
+				// The hub closed the channel.
+				conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			w, err := session.conn.NextWriter(websocket.TextMessage)
+			err := conn.WriteMessage(websocket.TextMessage, payload)
 			if err != nil {
-				return
-			}
-			_, err = w.Write(payload)
-			if err != nil {
-				// TODO HGA WILL ADAPT LATER
-			}
-
-			if err := w.Close(); err != nil {
-				return
+				log.Fatal("Error when send message to client")
 			}
 		}
 	}

@@ -1,24 +1,23 @@
 package channel
 
 import (
-	"mem-ws/socket/stomp/cmd"
-	"mem-ws/socket/stomp/msg"
+	"mem-ws/socket/stomp/stompmsg"
 	"mem-ws/socket/wserror"
 )
 
 type SubscribableChannel struct {
-	Handlers map[msg.Handler]struct{}
+	Handlers map[stompmsg.Handler]struct{}
 }
 
 func NewSubscribableChannel() Channel {
 	chann := &SubscribableChannel{
-		Handlers: make(map[msg.Handler]struct{}, 0),
+		Handlers: make(map[stompmsg.Handler]struct{}, 0),
 	}
 	go chann.startInternal()
 	return chann
 }
 
-//func (chann *SubscribableChannel) Subscribe(conn *websocket.Conn) (msg.Handler[[]byte], error) {
+//func (chann *SubscribableChannel) Subscribe(conn *websocket.Conn) (socketmsg.Handler[[]byte], error) {
 //	if conn == nil {
 //		return nil, wserror.IllegalArgument{Message: "Connection must not be null"}
 //	}
@@ -27,27 +26,27 @@ func NewSubscribableChannel() Channel {
 //	return handler, nil
 //}
 //
-//func (chann *SubscribableChannel) Disconnect(handler msg.Handler[[]byte]) {
+//func (chann *SubscribableChannel) Disconnect(handler socketmsg.Handler[[]byte]) {
 //	chann.DisConnectChan <- handler
 //}
 
-func (chann *SubscribableChannel) Subscribe(handler msg.Handler) error {
+func (chann *SubscribableChannel) Subscribe(handler stompmsg.Handler) error {
 	return nil
 }
 
-func (chann *SubscribableChannel) Unsubscribe(handler msg.Handler) error {
+func (chann *SubscribableChannel) Unsubscribe(handler stompmsg.Handler) error {
 	return nil
 }
 
-func (chann *SubscribableChannel) Send(message msg.Message[interface{}]) error {
+func (chann *SubscribableChannel) Send(message stompmsg.Message[interface{}]) error {
 	if message == nil {
 		return wserror.IllegalArgument{Message: "Message must not be null"}
 	}
-	headers := message.GetMessageHeaders()
-	switch headers.GetCommand() {
-	case cmd.Connect:
-
-	}
+	//headers := message.GetMessageHeaders()
+	//switch headers.GetCommand() {
+	//case client.Connect:
+	//
+	//}
 	return nil
 }
 
@@ -68,12 +67,12 @@ func (chann *SubscribableChannel) startInternal() {
 	}
 }
 
-func (chann *SubscribableChannel) doConnectInternal(handler msg.Handler) {
+func (chann *SubscribableChannel) doConnectInternal(handler stompmsg.Handler) {
 	//fmt.Printf("New client %s connected", handler.GetUserID())
-	//chann.OutBoundChannels[handler.GetUserID()] = []msg.Handler[[]byte]{handler}
+	//chann.OutBoundChannels[handler.GetUserID()] = []socketmsg.Handler[[]byte]{handler}
 }
 
-func (chann *SubscribableChannel) doDisConnectInternal(handler msg.Handler) {
+func (chann *SubscribableChannel) doDisConnectInternal(handler stompmsg.Handler) {
 	//fmt.Printf("Client %s disconnected", handler.GetUserID())
 	//delete(chann.OutBoundChannels, handler.GetUserID())
 	//err := handler.GetConn().Close()

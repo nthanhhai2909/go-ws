@@ -1,11 +1,11 @@
 package socket
 
 import (
-	"mem-ws/socket/message"
+	"mem-ws/socket/socketmsg"
 	"net/http"
 )
 
-type WebsocketSession interface {
+type IWebsocketSession interface {
 	GetID() string
 	GetHandshakeHeaders() http.Header
 	GetRemoteAddress()
@@ -16,7 +16,7 @@ type WebsocketSession interface {
 	SetBinaryMessageSizeLimit(size int)
 	GetBinaryMessageSizeLimit() int
 	GetExtensions()
-	SendMessage(message message.WebsocketMessage[[]byte])
+	SendMessage(message socketmsg.WebsocketMessage[[]byte])
 	IsOpen() bool
 	Close() error
 }
