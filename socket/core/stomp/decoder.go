@@ -79,7 +79,18 @@ func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {
 
 // TODO HGA WILL IMPLEMENT LATER
 func (d *Decoder) readPayload(buffer *bytes.Buffer) ([]byte, error) {
-	return nil, nil
+	payload := make([]byte, 0)
+	for {
+		ch, err := buffer.ReadByte()
+		if err != nil {
+			return nil, err
+		}
+		if ch == TerminalByte {
+			break
+		}
+		payload = append(payload, ch)
+	}
+	return payload, nil
 }
 
 func (d *Decoder) tryToGetEndOfLine(buffer *bytes.Buffer) (bool, error) {

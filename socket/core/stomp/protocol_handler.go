@@ -33,10 +33,11 @@ func (h *ProtocolHandler) HandleMessageFromClient(session socket.IWebsocketSessi
 	headers := msg.GetMessageHeaders()
 	switch headers.GetHeader(header.CommandHeader) {
 	case client.Connect:
-		h.SendMessageToClient(session, h.MessageBuilder.ConnectedMessage())
+		session.SendMessage(h.Encoder.Encode(h.MessageBuilder.ConnectedMessage()))
+	case client.Send:
+
 	}
 }
 
 func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, message smsg.Message[[]byte]) {
-	session.SendMessage(h.Encoder.Encode(message))
 }

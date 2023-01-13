@@ -11,6 +11,7 @@ var commandMap map[string]struct{}
 // Handle a STOMP frame in the same manner as a CONNECT frame
 const (
 	Connect       string = "CONNECT"
+	Send          string = "SEND"
 	Stomp         string = "STOMP"
 	ConnectACK    string = "CONNECT_ACK"
 	Subscribe     string = "SUBSCRIBE"
@@ -24,6 +25,7 @@ const (
 func init() {
 	commandMap = make(map[string]struct{}, 0)
 	commandMap["CONNECT"] = struct{}{}
+	commandMap["SEND"] = struct{}{}
 	commandMap["STOMP"] = struct{}{}
 	commandMap["CONNECT_ACK"] = struct{}{}
 	commandMap["SUBSCRIBE"] = struct{}{}

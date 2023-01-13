@@ -9,10 +9,6 @@ import (
 	"mem-ws/socket/msg/types"
 )
 
-var NullByte = []byte{0}
-
-const EndLineString = "\n"
-
 type Encoder struct {
 }
 
@@ -27,11 +23,11 @@ func (e *Encoder) Encode(msg smsg.Message[[]byte]) types.WebsocketMessage {
 		}
 		buff.WriteString(fmt.Sprintf("%s:%s\n", key, value))
 	}
-	buff.WriteString(EndLineString)
+	buff.WriteRune(EndLineStringRune)
 	if msg.GetPayload() != nil {
 		buff.Write(msg.GetPayload())
-		buff.WriteString(EndLineString)
+		buff.WriteRune(EndLineStringRune)
 	}
-	buff.Write(NullByte)
+	buff.WriteByte(TerminalByte)
 	return types.ToWebsocketMessage(websocket.TextMessage, buff.Bytes())
 }

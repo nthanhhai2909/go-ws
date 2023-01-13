@@ -6,6 +6,7 @@ import (
 	"mem-ws/socket/msg/types"
 )
 
+// ISubProtocolHandler is specifications that all sub-protocol such as Stomp have to implement
 type ISubProtocolHandler interface {
 
 	// SupportProtocols - Get protocol supports list

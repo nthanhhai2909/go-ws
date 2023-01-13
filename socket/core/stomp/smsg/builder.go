@@ -11,7 +11,7 @@ func (b *MessageBuilder) ConnectedMessage() Message[[]byte] {
 	message := &GenericMessage[[]byte]{}
 	messageHeaders := header.EmptyHeader()
 	messageHeaders.AddHeader(header.CommandHeader, server.Connected)
-	// TODO HGA CHECK CLIENT VERSION
+	// TODO HGA CHECK CLIENT VERSION FROM CLIENT MESSAGE
 	messageHeaders.AddHeader(header.StompVersionHeader, "1.1")
 	messageHeaders.AddHeader(header.StompContentLengthHeader, "0")
 	message.Headers = messageHeaders
