@@ -3,9 +3,9 @@ package stomp
 import (
 	"bytes"
 	"github.com/gorilla/websocket"
-	"mem-ws/socket"
 	"mem-ws/socket/core/header"
 	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/msg/types"
 )
 
 type Encoder struct {
@@ -15,7 +15,7 @@ func GetStompEncoder() *Encoder {
 	return &Encoder{}
 }
 
-func (e *Encoder) Encode(msg stompmsg.Message[[]byte]) socket.WebsocketMessage[[]byte] {
+func (e *Encoder) Encode(msg stompmsg.Message[[]byte]) types.WebsocketMessage {
 	msgBuffer := bytes.NewBuffer(make([]byte, 0))
 	headers := msg.GetMessageHeaders()
 	command := headers.GetHeader(header.CommandHeader)
@@ -36,5 +36,5 @@ func (e *Encoder) Encode(msg stompmsg.Message[[]byte]) socket.WebsocketMessage[[
 		msgBuffer.WriteString("\n")
 	}
 	msgBuffer.Write([]byte{0})
-	return socket.ToWebsocketMessage(websocket.TextMessage, msgBuffer.Bytes())
+	return types.ToWebsocketMessage(websocket.TextMessage, msgBuffer.Bytes())
 }

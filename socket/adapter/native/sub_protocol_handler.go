@@ -5,6 +5,7 @@ import (
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
 	"mem-ws/socket"
 	"mem-ws/socket/core/channel"
+	"mem-ws/socket/msg/types"
 )
 
 // SubProtocolWebsocketHandler is used to support multiple Sub-protocol such as STOMP, AMQP, etc
@@ -23,7 +24,7 @@ func (h *SubProtocolWebsocketHandler) AfterConnectionEstablished(session socket.
 	return nil
 }
 
-func (h *SubProtocolWebsocketHandler) HandleMessageFromClient(session socket.IWebsocketSession, message socket.WebsocketMessage[[]byte]) error {
+func (h *SubProtocolWebsocketHandler) HandleMessageFromClient(session socket.IWebsocketSession, message types.WebsocketMessage) error {
 	h.SubProtocolHandler.HandleMessageFromClient(session, message, h.ClientInboundChannel)
 	return nil
 }

@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"mem-ws/socket/msg/types"
 	"net/http"
 )
 
@@ -16,7 +17,7 @@ type IWebsocketSession interface {
 	SetBinaryMessageSizeLimit(size int)
 	GetBinaryMessageSizeLimit() int
 	GetExtensions()
-	SendMessage(message WebsocketMessage[[]byte])
+	SendMessage(message types.WebsocketMessage)
 	IsOpen() bool
 	Close() error
 }

@@ -4,7 +4,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"log"
-	"mem-ws/socket"
+	"mem-ws/socket/msg/types"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func NewWebsocketSession(conn *websocket.Conn, textSize int, binarySize int) *We
 		binarySize:       binarySize,
 	}
 
-	go session.startInternal()
+	go session.outboundInternal()
 	return session
 }
 
@@ -68,7 +68,7 @@ func (session *WebsocketSession) GetBinaryMessageSizeLimit() int {
 func (session *WebsocketSession) GetExtensions() {
 }
 
-func (session *WebsocketSession) SendMessage(message socket.WebsocketMessage[[]byte]) {
+func (session *WebsocketSession) SendMessage(message types.WebsocketMessage) {
 	session.outbound <- message.GetPayload()
 }
 
@@ -81,7 +81,7 @@ func (session *WebsocketSession) Close() error {
 	return err
 }
 
-func (session *WebsocketSession) startInternal() {
+func (session *WebsocketSession) outboundInternal() {
 
 	conn := session.conn
 	defer func() {

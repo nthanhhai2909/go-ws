@@ -1,11 +1,10 @@
 package provider
 
 import (
-	"fmt"
-	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
+	"mem-ws/socket/msg/types"
 	"net/http"
 )
 
@@ -49,15 +48,11 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		messageType, payload, err := conn.ReadMessage()
 		// TODO HGA WILL HANDLE ERROR
 		if err != nil {
-			fmt.Println(err.Error())
-			log.Println("container: Error when send stompmsg")
+			log.Println(err.Error())
+			log.Println("container: Error when send message")
 			return
 		}
-		websocketMessage := socket.ToWebsocketMessage(messageType, payload)
-		// TODO HGA WILL CHECK MESSAGE TYPE
-		if messageType != websocket.TextMessage {
-			return
-		}
+		websocketMessage := types.ToWebsocketMessage(messageType, payload)
 		err = websocketHandler.HandleMessageFromClient(websocketSession, websocketMessage)
 		if err != nil {
 			log.Println("Error when send stompmsg")

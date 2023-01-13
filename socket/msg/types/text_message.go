@@ -1,4 +1,4 @@
-package socket
+package types
 
 type TextMessage struct {
 	bytes []byte
@@ -12,7 +12,7 @@ func (msg *TextMessage) GetPayloadLength() int {
 	return len(msg.bytes)
 }
 
-// TODO HGA WILL UPDATE
+// IsLast TODO HGA WILL UPDATE
 func (msg *TextMessage) IsLast() bool {
 	return true
 }

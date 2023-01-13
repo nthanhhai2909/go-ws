@@ -1,14 +1,16 @@
-package socket
+package types
 
-import "github.com/gorilla/websocket"
+import (
+	"github.com/gorilla/websocket"
+)
 
-type WebsocketMessage[T interface{}] interface {
-	GetPayload() T
+type WebsocketMessage interface {
+	GetPayload() []byte
 	GetPayloadLength() int
 	IsLast() bool
 }
 
-func ToWebsocketMessage(messageType int, payload []byte) WebsocketMessage[[]byte] {
+func ToWebsocketMessage(messageType int, payload []byte) WebsocketMessage {
 	switch messageType {
 	case websocket.TextMessage:
 		return &TextMessage{bytes: payload}
