@@ -2,7 +2,7 @@ package channel
 
 import (
 	"mem-ws/socket/core/errors"
-	stompmsg2 "mem-ws/socket/core/stomp/stompmsg"
+	stompmsg2 "mem-ws/socket/core/stomp/smsg"
 )
 
 type SubscribableChannel struct {
@@ -17,7 +17,7 @@ func NewSubscribableChannel() Channel {
 	return chann
 }
 
-//func (chann *SubscribableChannel) Subscribe(conn *websocket.Conn) (stompmsg.Handler[[]byte], error) {
+//func (chann *SubscribableChannel) Subscribe(conn *websocket.Conn) (smsg.Handler[[]byte], error) {
 //	if conn == nil {
 //		return nil, errors.IllegalArgument{Message: "Connection must not be null"}
 //	}
@@ -26,7 +26,7 @@ func NewSubscribableChannel() Channel {
 //	return handler, nil
 //}
 //
-//func (chann *SubscribableChannel) Disconnect(handler stompmsg.Handler[[]byte]) {
+//func (chann *SubscribableChannel) Disconnect(handler smsg.Handler[[]byte]) {
 //	chann.DisConnectChan <- handler
 //}
 
@@ -69,7 +69,7 @@ func (chann *SubscribableChannel) startInternal() {
 
 func (chann *SubscribableChannel) doConnectInternal(handler stompmsg2.Handler) {
 	//fmt.Printf("New client %s connected", handler.GetUserID())
-	//chann.OutBoundChannels[handler.GetUserID()] = []stompmsg.Handler[[]byte]{handler}
+	//chann.OutBoundChannels[handler.GetUserID()] = []smsg.Handler[[]byte]{handler}
 }
 
 func (chann *SubscribableChannel) doDisConnectInternal(handler stompmsg2.Handler) {

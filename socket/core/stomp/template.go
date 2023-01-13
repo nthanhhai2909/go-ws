@@ -4,7 +4,7 @@ import (
 	"mem-ws/socket/core/channel"
 	"mem-ws/socket/core/converter"
 	"mem-ws/socket/core/errors"
-	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/core/stomp/smsg"
 )
 
 type MessageTemplate[P interface{}] struct {
@@ -13,7 +13,7 @@ type MessageTemplate[P interface{}] struct {
 	MessageConverter converter.MessageConverter[P]
 }
 
-func (template *MessageTemplate[P]) Send(destination string, msg stompmsg.Message[P]) error {
+func (template *MessageTemplate[P]) Send(destination string, msg smsg.Message[P]) error {
 	if destination == "" {
 		return errors.IllegalArgument{Message: "Destination is required"}
 	}
@@ -22,7 +22,7 @@ func (template *MessageTemplate[P]) Send(destination string, msg stompmsg.Messag
 		return errors.IllegalArgument{Message: "Message is required"}
 	}
 
-	//stompmsg.GetMessageHeaders().SetDestination(destination)
-	//return template.MessageChannel.Send(stompmsg, template.Timeout)
+	//smsg.GetMessageHeaders().SetDestination(destination)
+	//return template.MessageChannel.Send(smsg, template.Timeout)
 	return nil
 }

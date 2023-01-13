@@ -55,7 +55,7 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		websocketMessage := types.ToWebsocketMessage(messageType, payload)
 		err = websocketHandler.HandleMessageFromClient(websocketSession, websocketMessage)
 		if err != nil {
-			log.Println("Error when send stompmsg")
+			log.Println("Error when send smsg")
 			return
 		}
 	}

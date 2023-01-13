@@ -1,4 +1,4 @@
-package stompmsg
+package smsg
 
 import (
 	"mem-ws/socket/core/header"

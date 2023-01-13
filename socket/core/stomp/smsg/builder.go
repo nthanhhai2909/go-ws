@@ -1,4 +1,4 @@
-package stompmsg
+package smsg
 
 import (
 	"mem-ws/socket/core/header"
@@ -9,11 +9,11 @@ type MessageBuilder struct{}
 
 func (b *MessageBuilder) ConnectedMessage() Message[[]byte] {
 	message := &GenericMessage[[]byte]{}
-	messageHeaders := header.NewHeader()
-	messageHeaders.SetHeader(header.CommandHeader, server.Connected)
+	messageHeaders := header.EmptyHeader()
+	messageHeaders.AddHeader(header.CommandHeader, server.Connected)
 	// TODO HGA CHECK CLIENT VERSION
-	messageHeaders.SetHeader(header.StompVersionHeader, "1.1")
-	messageHeaders.SetHeader(header.StompContentLengthHeader, "0")
+	messageHeaders.AddHeader(header.StompVersionHeader, "1.1")
+	messageHeaders.AddHeader(header.StompContentLengthHeader, "0")
 	message.Headers = messageHeaders
 	return message
 }

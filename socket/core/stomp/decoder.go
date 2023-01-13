@@ -5,7 +5,7 @@ import (
 	"mem-ws/socket/core/errors"
 	"mem-ws/socket/core/header"
 	"mem-ws/socket/core/stomp/cmd/client"
-	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/core/stomp/smsg"
 	"strings"
 )
 
@@ -13,12 +13,8 @@ import (
 type Decoder struct {
 }
 
-func GetStompDecoder() *Decoder {
-	return &Decoder{}
-}
-
-// TODO HGA WILL PROCESS FOR ERROR MESSAGE
-func (d *Decoder) Decode(buff []byte) (stompmsg.Message[[]byte], error) {
+// Decode TODO HGA WILL PROCESS FOR ERROR MESSAGE
+func (d *Decoder) Decode(buff []byte) (smsg.Message[[]byte], error) {
 	buffer := bytes.NewBuffer(buff)
 	command, err := d.readCommand(buffer)
 	if err != nil {
@@ -28,12 +24,12 @@ func (d *Decoder) Decode(buff []byte) (stompmsg.Message[[]byte], error) {
 	if err != nil {
 		return nil, err
 	}
-	headers.SetHeader(header.CommandHeader, command.Type)
+	headers.AddHeader(header.CommandHeader, command.Type)
 	payload, err := d.readPayload(buffer)
 	if err != nil {
 		return nil, err
 	}
-	return &stompmsg.GenericMessage[[]byte]{
+	return &smsg.GenericMessage[[]byte]{
 		Headers: headers,
 		Payload: payload,
 	}, nil
@@ -58,7 +54,7 @@ func (d *Decoder) readCommand(buffer *bytes.Buffer) (*client.Command, error) {
 }
 
 func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {
-	headers := header.NewHeader()
+	headers := header.EmptyHeader()
 	for {
 		headerItem := bytes.NewBuffer(make([]byte, 0))
 		for {
@@ -73,7 +69,7 @@ func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {
 			headerItem.WriteRune(ch)
 		}
 		strs := strings.Split(headerItem.String(), ":")
-		headers.SetHeader(strs[0], strs[1])
+		headers.AddHeader(strs[0], strs[1])
 		if isEnd, _ := d.tryToGetEndOfLine(buffer); isEnd {
 			break
 		}

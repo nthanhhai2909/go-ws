@@ -2,39 +2,36 @@ package stomp
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"mem-ws/socket/core/header"
-	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/core/stomp/smsg"
 	"mem-ws/socket/msg/types"
 )
+
+var NullByte = []byte{0}
+
+const EndLineString = "\n"
 
 type Encoder struct {
 }
 
-func GetStompEncoder() *Encoder {
-	return &Encoder{}
-}
-
-func (e *Encoder) Encode(msg stompmsg.Message[[]byte]) types.WebsocketMessage {
-	msgBuffer := bytes.NewBuffer(make([]byte, 0))
+func (e *Encoder) Encode(msg smsg.Message[[]byte]) types.WebsocketMessage {
+	buff := bytes.NewBuffer(make([]byte, 0))
 	headers := msg.GetMessageHeaders()
 	command := headers.GetHeader(header.CommandHeader)
-	msgBuffer.WriteString(command)
-	msgBuffer.WriteString("\n")
-	for key, value := range headers.GetHeaderProperties() {
+	buff.WriteString(fmt.Sprintf("%s\n", command))
+	for key, value := range headers.Properties {
 		if key == header.CommandHeader {
 			continue
 		}
-		msgBuffer.WriteString(key)
-		msgBuffer.WriteString(":")
-		msgBuffer.WriteString(value)
-		msgBuffer.WriteString("\n")
+		buff.WriteString(fmt.Sprintf("%s:%s\n", key, value))
 	}
-	msgBuffer.WriteString("\n")
+	buff.WriteString(EndLineString)
 	if msg.GetPayload() != nil {
-		msgBuffer.Write(msg.GetPayload())
-		msgBuffer.WriteString("\n")
+		buff.Write(msg.GetPayload())
+		buff.WriteString(EndLineString)
 	}
-	msgBuffer.Write([]byte{0})
-	return types.ToWebsocketMessage(websocket.TextMessage, msgBuffer.Bytes())
+	buff.Write(NullByte)
+	return types.ToWebsocketMessage(websocket.TextMessage, buff.Bytes())
 }

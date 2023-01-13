@@ -4,12 +4,12 @@ const (
 	StompIdHeader            = "id"
 	StompHostHeader          = "host"
 	StompAcceptVersionHeader = "accept-version"
-	StompMessageIdHeader     = "stompmsg-id"
+	StompMessageIdHeader     = "smsg-id"
 	StompReceiptHeader       = "receipt"
 	StompReceiptIdHeader     = "receipt-id"
 	StompSubscriptionHeader  = "subscription"
 	StompVersionHeader       = "version"
-	StompMessageHeader       = "stompmsg"
+	StompMessageHeader       = "smsg"
 	StompAckHeader           = "ack"
 	StompNackHeader          = "nack"
 	StompLoginHeader         = "login"
@@ -23,22 +23,22 @@ const (
 )
 
 type Headers struct {
-	headers map[string]string
+	Properties map[string]string
 }
 
-func NewHeader() *Headers {
-	return &Headers{headers: make(map[string]string, 0)}
+func EmptyHeader() *Headers {
+	return &Headers{Properties: make(map[string]string, 0)}
 }
 
-func (h *Headers) SetHeader(key string, value string) {
+func WithProperties(properties map[string]string) *Headers {
+	return &Headers{properties}
+}
+
+func (h *Headers) AddHeader(key string, value string) {
 	// TODO HGA WILL CHECK KEY VALUE IN RANGE
-	h.headers[key] = value
+	h.Properties[key] = value
 }
 
 func (h *Headers) GetHeader(key string) string {
-	return h.headers[key]
-}
-
-func (h *Headers) GetHeaderProperties() map[string]string {
-	return h.headers
+	return h.Properties[key]
 }

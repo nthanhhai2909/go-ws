@@ -5,7 +5,7 @@ import (
 	"mem-ws/socket/core/channel"
 	"mem-ws/socket/core/header"
 	"mem-ws/socket/core/stomp/cmd/client"
-	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/core/stomp/smsg"
 	"mem-ws/socket/msg/types"
 )
 
@@ -13,14 +13,14 @@ import (
 type ProtocolHandler struct {
 	Decoder        *Decoder
 	Encoder        *Encoder
-	MessageBuilder *stompmsg.MessageBuilder
+	MessageBuilder *smsg.MessageBuilder
 }
 
 func NewProtocolHandler() socket.ISubProtocolHandler {
 	return &ProtocolHandler{
-		Decoder:        GetStompDecoder(),
-		Encoder:        GetStompEncoder(),
-		MessageBuilder: &stompmsg.MessageBuilder{},
+		Decoder:        &Decoder{},
+		Encoder:        &Encoder{},
+		MessageBuilder: &smsg.MessageBuilder{},
 	}
 }
 
@@ -37,6 +37,6 @@ func (h *ProtocolHandler) HandleMessageFromClient(session socket.IWebsocketSessi
 	}
 }
 
-func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, message stompmsg.Message[[]byte]) {
+func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, message smsg.Message[[]byte]) {
 	session.SendMessage(h.Encoder.Encode(message))
 }

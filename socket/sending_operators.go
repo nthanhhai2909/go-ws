@@ -1,9 +1,9 @@
 package socket
 
 import (
-	"mem-ws/socket/core/stomp/stompmsg"
+	"mem-ws/socket/core/stomp/smsg"
 )
 
 type SendingOperations[P interface{}] interface {
-	Send(destination string, message stompmsg.Message[P]) error
+	Send(destination string, message smsg.Message[P]) error
 }

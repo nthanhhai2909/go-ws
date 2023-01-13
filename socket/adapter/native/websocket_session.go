@@ -81,6 +81,7 @@ func (session *WebsocketSession) Close() error {
 	return err
 }
 
+// outboundInternal - process messagetype
 func (session *WebsocketSession) outboundInternal() {
 
 	conn := session.conn

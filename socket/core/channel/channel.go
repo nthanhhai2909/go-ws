@@ -1,7 +1,7 @@
 package channel
 
 import (
-	stompmsg2 "mem-ws/socket/core/stomp/stompmsg"
+	stompmsg2 "mem-ws/socket/core/stomp/smsg"
 )
 
 type Channel interface {
