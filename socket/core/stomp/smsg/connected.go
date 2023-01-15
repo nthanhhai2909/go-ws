@@ -17,7 +17,7 @@ func Connected(version string) IMessage[[]byte] {
 }
 
 func (msg *connected) GetPayload() []byte {
-	return []byte{}
+	return nil
 }
 
 func (msg *connected) GetMessageHeaders() *header.Headers {

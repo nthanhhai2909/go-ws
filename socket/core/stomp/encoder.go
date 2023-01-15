@@ -29,6 +29,5 @@ func (e *Encoder) Encode(msg smsg.IMessage[[]byte]) socket.WebsocketMessage {
 		buff.WriteRune(EndLineStringRune)
 	}
 	buff.WriteByte(TerminalByte)
-	fmt.Println(buff.String())
 	return socket.ToWebsocketMessage(websocket.TextMessage, buff.Bytes())
 }

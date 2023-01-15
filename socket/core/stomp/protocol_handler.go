@@ -2,6 +2,7 @@ package stomp
 
 import (
 	"fmt"
+	"github.com/nthanhhai2909/go-commons-lang/sliceutils"
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
 	"mem-ws/socket"
 	"mem-ws/socket/core/errors"
@@ -9,6 +10,7 @@ import (
 	"mem-ws/socket/core/stomp/channel"
 	"mem-ws/socket/core/stomp/cmd/client"
 	"mem-ws/socket/core/stomp/smsg"
+	"strings"
 )
 
 // ProtocolHandler - socket.ISubProtocolHandler Implementation
@@ -65,18 +67,17 @@ func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, 
 }
 
 func commonVersionUse(clientAcceptVersion string) (string, error) {
-	return stringutils.EMPTY, errors.MessageConversion{Message: fmt.Sprintf("Supported protocol versions are %s", SupportVersionInString)}
-	//var clientVersions []string
-	//if stringutils.IsBlank(clientAcceptVersion) {
-	//	clientVersions = []string{"v10.stomp"}
-	//} else {
-	//	clientVersions = strings.Split(clientAcceptVersion, ",")
-	//}
-	//
-	//commons := sliceutils.Union(clientVersions, SupportVersion)
-	//
-	//if sliceutils.IsEmpty(commons) {
-	//	return stringutils.EMPTY, errors.MessageConversion{Message: fmt.Sprintf("Supported protocol versions are %s", SupportVersionInString)}
-	//}
-	//return commons[0], nil
+	var clientVersions []string
+	if stringutils.IsBlank(clientAcceptVersion) {
+		clientVersions = []string{"v10.stomp"}
+	} else {
+		clientVersions = strings.Split(clientAcceptVersion, ",")
+	}
+
+	commons := sliceutils.Union(clientVersions, SupportVersion)
+
+	if sliceutils.IsEmpty(commons) {
+		return stringutils.EMPTY, errors.MessageConversion{Message: fmt.Sprintf("Supported protocol versions are %s", SupportVersionInString)}
+	}
+	return commons[0], nil
 }
