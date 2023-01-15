@@ -7,27 +7,32 @@ import (
 	"net/http"
 )
 
-type WSContainer interface {
+type WSStarter interface {
 	Handler(w http.ResponseWriter, r *http.Request)
 }
 
-type wscontainer struct {
+type wsStarter struct {
 	factory *WebsocketConnectionFactory
 }
 
-func NewWSContainer(websocketConnectionFactory *WebsocketConnectionFactory) WSContainer {
-	return &wscontainer{
-		factory: websocketConnectionFactory,
+func NewWSStarter(configuration WebsocketConnectionConfiguration) WSStarter {
+	factory, err := NewWebSocketConnectionFactory(configuration)
+	if err != nil {
+		log.Panic("Configuration Error")
+	}
+
+	return &wsStarter{
+		factory: factory,
 	}
 }
 
-func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
-	conn, err := container.factory.GetUpgrader().Upgrade(w, r, nil)
+func (starter *wsStarter) Handler(w http.ResponseWriter, r *http.Request) {
+	conn, err := starter.factory.GetUpgrader().Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("upgrade:", err)
 		return
 	}
-	websocketHandler := container.factory.GetSubProtocolWebsocketHandler()
+	websocketHandler := starter.factory.GetSubProtocolWebsocketHandler()
 	// TODO ALLOW SETUP TEXT AND BINARY SIZE
 	websocketSession := native.NewWebsocketSession(conn, 1024, 1024)
 	err = websocketHandler.AfterConnectionEstablished(websocketSession)
@@ -48,7 +53,7 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 		// TODO HGA WILL HANDLE ERROR
 		if err != nil {
 			log.Println(err.Error())
-			log.Println("container: Error when send message")
+			log.Println("starter: Error when send message")
 			return
 		}
 		websocketMessage := socket.ToWebsocketMessage(messageType, payload)

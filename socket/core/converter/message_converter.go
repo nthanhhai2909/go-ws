@@ -10,7 +10,3 @@ type MessageConverter[P interface{}] interface {
 	FromMessage(msg smsg.IMessage, target P) error
 	ToMessage(payload P, headers header.Headers) (error, smsg.IMessage)
 }
-
-func NewStringMessageConverter[P interface{}]() MessageConverter[P] {
-	return &stringMessageConverter[P]{}
-}
