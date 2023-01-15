@@ -14,7 +14,7 @@ type Decoder struct {
 }
 
 // Decode TODO HGA WILL PROCESS FOR ERROR MESSAGE
-func (d *Decoder) Decode(buff []byte) (smsg.Message[[]byte], error) {
+func (d *Decoder) Decode(buff []byte) (smsg.IMessage[[]byte], error) {
 	buffer := bytes.NewBuffer(buff)
 	command, err := d.readCommand(buffer)
 	if err != nil {
@@ -77,7 +77,6 @@ func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {
 	return headers, nil
 }
 
-// TODO HGA WILL IMPLEMENT LATER
 func (d *Decoder) readPayload(buffer *bytes.Buffer) ([]byte, error) {
 	payload := make([]byte, 0)
 	for {

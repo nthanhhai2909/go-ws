@@ -4,7 +4,6 @@ import (
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
-	"mem-ws/socket/msg/types"
 	"net/http"
 )
 
@@ -52,7 +51,7 @@ func (container *wscontainer) Handler(w http.ResponseWriter, r *http.Request) {
 			log.Println("container: Error when send message")
 			return
 		}
-		websocketMessage := types.ToWebsocketMessage(messageType, payload)
+		websocketMessage := socket.ToWebsocketMessage(messageType, payload)
 		err = websocketHandler.HandleMessageFromClient(websocketSession, websocketMessage)
 		if err != nil {
 			log.Println("Error when send smsg")

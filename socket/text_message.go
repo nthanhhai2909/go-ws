@@ -1,4 +1,4 @@
-package types
+package socket
 
 type TextMessage struct {
 	bytes []byte

@@ -4,15 +4,12 @@ import (
 	"github.com/nthanhhai2909/go-commons-lang/errors/illegal/argument"
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
 	"mem-ws/socket"
-	"mem-ws/socket/core/channel"
-	"mem-ws/socket/msg/types"
 )
 
 // SubProtocolWebsocketHandler is used to support multiple Sub-protocol such as STOMP, AMQP, etc
 type SubProtocolWebsocketHandler struct {
-	ClientInboundChannel channel.Channel
-	SubProtocolHandler   socket.ISubProtocolHandler
-	Sessions             map[string]socket.IWebsocketSession
+	SubProtocolHandler socket.ISubProtocolHandler
+	Sessions           map[string]socket.IWebsocketSession
 }
 
 func (h *SubProtocolWebsocketHandler) AfterConnectionEstablished(session socket.IWebsocketSession) error {
@@ -24,8 +21,8 @@ func (h *SubProtocolWebsocketHandler) AfterConnectionEstablished(session socket.
 	return nil
 }
 
-func (h *SubProtocolWebsocketHandler) HandleMessageFromClient(session socket.IWebsocketSession, message types.WebsocketMessage) error {
-	h.SubProtocolHandler.HandleMessageFromClient(session, message, h.ClientInboundChannel)
+func (h *SubProtocolWebsocketHandler) HandleMessageFromClient(session socket.IWebsocketSession, message socket.WebsocketMessage) error {
+	h.SubProtocolHandler.HandleMessageFromClient(session, message)
 	return nil
 }
 

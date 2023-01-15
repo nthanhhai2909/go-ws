@@ -1,4 +1,4 @@
-package types
+package socket
 
 type PingMessage struct {
 	bytes []byte

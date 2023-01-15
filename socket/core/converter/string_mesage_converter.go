@@ -8,10 +8,10 @@ import (
 type stringMessageConverter[P interface{}] struct {
 }
 
-func (converter *stringMessageConverter[P]) FromMessage(msg smsg.Message[P], target P) error {
+func (converter *stringMessageConverter[P]) FromMessage(msg smsg.IMessage[P], target P) error {
 	return nil
 }
 
-func (converter *stringMessageConverter[P]) ToMessage(payload P, headers header.Headers) (error, smsg.Message[P]) {
+func (converter *stringMessageConverter[P]) ToMessage(payload P, headers header.Headers) (error, smsg.IMessage[P]) {
 	return nil, nil
 }

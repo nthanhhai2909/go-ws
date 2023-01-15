@@ -5,7 +5,6 @@ import (
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
-	"mem-ws/socket/core/channel"
 	"mem-ws/socket/core/errors"
 	"mem-ws/socket/core/stomp"
 )
@@ -31,9 +30,9 @@ func NewWebSocketConnectionFactory(configuration WebsocketConnectionConfiguratio
 	// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
 	return &WebsocketConnectionFactory{
 		subProtocolWebsocketHandler: &native.SubProtocolWebsocketHandler{
-			ClientInboundChannel: channel.NewSubscribableChannel(),
-			Sessions:             make(map[string]socket.IWebsocketSession),
-			SubProtocolHandler:   stomp.NewProtocolHandler(),
+			Sessions: make(map[string]socket.IWebsocketSession),
+			// TODO SUPPORT INIT SUB-PROTOCOL BY CONFIGURATION
+			SubProtocolHandler: stomp.NewProtocolHandler(),
 		},
 		upgrader: upgrader,
 	}, nil

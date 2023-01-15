@@ -1,9 +1,9 @@
 package stomp
 
 import (
-	"mem-ws/socket/core/channel"
 	"mem-ws/socket/core/converter"
 	"mem-ws/socket/core/errors"
+	"mem-ws/socket/core/stomp/channel"
 	"mem-ws/socket/core/stomp/smsg"
 )
 
@@ -13,13 +13,13 @@ type MessageTemplate[P interface{}] struct {
 	MessageConverter converter.MessageConverter[P]
 }
 
-func (template *MessageTemplate[P]) Send(destination string, msg smsg.Message[P]) error {
+func (template *MessageTemplate[P]) Send(destination string, msg smsg.IMessage[P]) error {
 	if destination == "" {
 		return errors.IllegalArgument{Message: "Destination is required"}
 	}
 
 	if msg == nil {
-		return errors.IllegalArgument{Message: "Message is required"}
+		return errors.IllegalArgument{Message: "IMessage is required"}
 	}
 
 	//smsg.GetMessageHeaders().SetDestination(destination)

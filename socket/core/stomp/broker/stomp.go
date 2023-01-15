@@ -1,4 +1,4 @@
 package broker
 
-type StompBroker struct {
+type Broker struct {
 }

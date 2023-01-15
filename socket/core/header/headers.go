@@ -23,11 +23,11 @@ const (
 )
 
 type Headers struct {
-	Properties map[string]string
+	properties map[string]string
 }
 
 func EmptyHeader() *Headers {
-	return &Headers{Properties: make(map[string]string, 0)}
+	return &Headers{properties: make(map[string]string, 0)}
 }
 
 func WithProperties(properties map[string]string) *Headers {
@@ -36,9 +36,13 @@ func WithProperties(properties map[string]string) *Headers {
 
 func (h *Headers) AddHeader(key string, value string) {
 	// TODO HGA WILL CHECK KEY VALUE IN RANGE
-	h.Properties[key] = value
+	h.properties[key] = value
 }
 
 func (h *Headers) GetHeader(key string) string {
-	return h.Properties[key]
+	return h.properties[key]
+}
+
+func (h *Headers) Properties() map[string]string {
+	return h.properties
 }

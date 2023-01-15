@@ -1,4 +1,4 @@
-package types
+package socket
 
 import (
 	"github.com/gorilla/websocket"

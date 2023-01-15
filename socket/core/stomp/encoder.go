@@ -4,20 +4,20 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gorilla/websocket"
+	"mem-ws/socket"
 	"mem-ws/socket/core/header"
 	"mem-ws/socket/core/stomp/smsg"
-	"mem-ws/socket/msg/types"
 )
 
 type Encoder struct {
 }
 
-func (e *Encoder) Encode(msg smsg.Message[[]byte]) types.WebsocketMessage {
+func (e *Encoder) Encode(msg smsg.IMessage[[]byte]) socket.WebsocketMessage {
 	buff := bytes.NewBuffer(make([]byte, 0))
 	headers := msg.GetMessageHeaders()
 	command := headers.GetHeader(header.CommandHeader)
 	buff.WriteString(fmt.Sprintf("%s\n", command))
-	for key, value := range headers.Properties {
+	for key, value := range headers.Properties() {
 		if key == header.CommandHeader {
 			continue
 		}
@@ -29,5 +29,6 @@ func (e *Encoder) Encode(msg smsg.Message[[]byte]) types.WebsocketMessage {
 		buff.WriteRune(EndLineStringRune)
 	}
 	buff.WriteByte(TerminalByte)
-	return types.ToWebsocketMessage(websocket.TextMessage, buff.Bytes())
+	fmt.Println(buff.String())
+	return socket.ToWebsocketMessage(websocket.TextMessage, buff.Bytes())
 }

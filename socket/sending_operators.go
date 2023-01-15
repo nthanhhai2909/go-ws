@@ -5,5 +5,5 @@ import (
 )
 
 type SendingOperations[P interface{}] interface {
-	Send(destination string, message smsg.Message[P]) error
+	Send(destination string, message smsg.IMessage[P]) error
 }
