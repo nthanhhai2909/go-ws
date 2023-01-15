@@ -27,12 +27,13 @@ func NewWSStarter(configuration WebsocketConnectionConfiguration) WSStarter {
 }
 
 func (starter *wsStarter) Handler(w http.ResponseWriter, r *http.Request) {
-	conn, err := starter.factory.GetUpgrader().Upgrade(w, r, nil)
+	factory := starter.factory
+	conn, err := factory.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("upgrade:", err)
 		return
 	}
-	websocketHandler := starter.factory.GetSubProtocolWebsocketHandler()
+	websocketHandler := factory.SubProtocolWebsocketHandler
 	// TODO ALLOW SETUP TEXT AND BINARY SIZE
 	websocketSession := native.NewWebsocketSession(conn, 1024, 1024)
 	err = websocketHandler.AfterConnectionEstablished(websocketSession)
