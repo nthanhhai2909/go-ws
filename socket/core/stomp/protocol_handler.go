@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/nthanhhai2909/go-commons-lang/sliceutils"
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
+	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/core/errors"
 	"mem-ws/socket/core/header"
@@ -56,14 +57,20 @@ func (h *ProtocolHandler) HandleMessageFromClient(session socket.IWebsocketSessi
 		session.SendMessage(encoder.Encode(smsg.Connected(stompVersion)))
 	case client.Send:
 		if stringutils.IsBlank(destination) {
-			fmt.Println("test")
-			// TODO HGA WILL RETURN ERROR TO CLIENT
+			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
+				header.StompVersionHeader:     SupportVersionInString,
+				header.StompContentTypeHeader: TextPlain,
+			}, []byte("Destination must not be null"))))
 		}
-		//h.InboundChannel.Send(messageBuilder.)
+		err := h.InboundChannel.Send(msg)
+		if err != nil {
+			// TODO HGA WILL PROCESS IN CASE FAILED
+			log.Fatal("Fail to send message to client")
+		}
 	}
 }
 
-func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, message smsg.IMessage[[]byte]) {
+func (h *ProtocolHandler) SendMessageToClient(session socket.IWebsocketSession, message smsg.IMessage) {
 }
 
 func commonVersionUse(clientAcceptVersion string) (string, error) {

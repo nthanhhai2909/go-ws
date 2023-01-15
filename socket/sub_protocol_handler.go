@@ -14,5 +14,5 @@ type ISubProtocolHandler interface {
 	HandleMessageFromClient(session IWebsocketSession, message WebsocketMessage)
 
 	// SendMessageToClient - Send message to client
-	SendMessageToClient(session IWebsocketSession, message smsg.IMessage[[]byte])
+	SendMessageToClient(session IWebsocketSession, message smsg.IMessage)
 }

@@ -9,7 +9,7 @@ type connected struct {
 	headers *header.Headers
 }
 
-func Connected(version string) IMessage[[]byte] {
+func Connected(version string) IMessage {
 	headerInit := header.EmptyHeader()
 	headerInit.AddHeader(header.CommandHeader, server.Connected)
 	headerInit.AddHeader(header.StompVersionHeader, version)

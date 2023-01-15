@@ -17,6 +17,6 @@ func (chann *Subscribable) Unsubscribe(handler smsg.Handler) error {
 	return nil
 }
 
-func (chann *Subscribable) Send(message smsg.IMessage[interface{}]) error {
+func (chann *Subscribable) Send(message smsg.IMessage) error {
 	return nil
 }

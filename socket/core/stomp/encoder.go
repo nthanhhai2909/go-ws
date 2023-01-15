@@ -12,7 +12,7 @@ import (
 type Encoder struct {
 }
 
-func (e *Encoder) Encode(msg smsg.IMessage[[]byte]) socket.WebsocketMessage {
+func (e *Encoder) Encode(msg smsg.IMessage) socket.WebsocketMessage {
 	buff := bytes.NewBuffer(make([]byte, 0))
 	headers := msg.GetMessageHeaders()
 	command := headers.GetHeader(header.CommandHeader)

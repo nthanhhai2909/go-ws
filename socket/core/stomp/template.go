@@ -13,7 +13,7 @@ type MessageTemplate[P interface{}] struct {
 	MessageConverter converter.MessageConverter[P]
 }
 
-func (template *MessageTemplate[P]) Send(destination string, msg smsg.IMessage[P]) error {
+func (template *MessageTemplate[P]) Send(destination string, msg smsg.IMessage) error {
 	if destination == "" {
 		return errors.IllegalArgument{Message: "Destination is required"}
 	}

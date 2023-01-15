@@ -1,5 +1,5 @@
 package smsg
 
 type Handler interface {
-	HandleMessage(msg IMessage[interface{}]) error
+	HandleMessage(msg IMessage) error
 }

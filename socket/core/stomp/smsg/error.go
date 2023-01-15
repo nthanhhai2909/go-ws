@@ -10,7 +10,7 @@ type err struct {
 	payload []byte
 }
 
-func Error(headerProperties map[string]string, payload []byte) IMessage[[]byte] {
+func Error(headerProperties map[string]string, payload []byte) IMessage {
 	headerInit := header.EmptyHeader()
 	headerInit.AddHeader(header.CommandHeader, server.Error)
 	for key, ele := range headerProperties {

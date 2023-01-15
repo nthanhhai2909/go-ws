@@ -7,8 +7,8 @@ import (
 
 // MessageConverter TODO HGA: UPDATING
 type MessageConverter[P interface{}] interface {
-	FromMessage(msg smsg.IMessage[P], target P) error
-	ToMessage(payload P, headers header.Headers) (error, smsg.IMessage[P])
+	FromMessage(msg smsg.IMessage, target P) error
+	ToMessage(payload P, headers header.Headers) (error, smsg.IMessage)
 }
 
 func NewStringMessageConverter[P interface{}]() MessageConverter[P] {
