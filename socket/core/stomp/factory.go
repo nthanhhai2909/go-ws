@@ -1,12 +1,12 @@
-package provider
+package stomp
 
 import (
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
+	"mem-ws/socket/core/conf"
 	"mem-ws/socket/core/errors"
-	"mem-ws/socket/core/stomp"
 )
 
 type WebsocketConnectionConfigurationError struct {
@@ -20,7 +20,7 @@ type WebsocketConnectionFactory struct {
 	SubProtocolWebsocketHandler socket.IWebsocketHandler
 }
 
-func NewWebSocketConnectionFactory(configuration WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
+func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
 	upgrader, err := initWebsocketUpgrader(configuration)
 
 	if err != nil {
@@ -32,13 +32,13 @@ func NewWebSocketConnectionFactory(configuration WebsocketConnectionConfiguratio
 		SubProtocolWebsocketHandler: &native.SubProtocolWebsocketHandler{
 			Sessions: make(map[string]socket.IWebsocketSession),
 			// TODO SUPPORT INIT SUB-PROTOCOL BY CONFIGURATION
-			SubProtocolHandler: stomp.NewProtocolHandler(),
+			SubProtocolHandler: NewProtocolHandler(),
 		},
 		Upgrader: upgrader,
 	}, nil
 }
 
-func initWebsocketUpgrader(configuration WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {
+func initWebsocketUpgrader(configuration conf.WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {
 	if configuration.GetReadBufferSize() <= 0 || configuration.GetWriteBufferSize() <= 0 {
 		return nil, errors.InvalidConfigurationError()
 	}

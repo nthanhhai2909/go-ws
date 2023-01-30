@@ -1,32 +1,32 @@
-package provider
+package stomp
 
 import (
 	"log"
 	"mem-ws/socket"
 	"mem-ws/socket/adapter/native"
+	"mem-ws/socket/core/conf"
+	"mem-ws/socket/core/stomp/registry"
 	"net/http"
 )
 
-type WSStarter interface {
-	Handler(w http.ResponseWriter, r *http.Request)
+type Starter struct {
+	factory  *WebsocketConnectionFactory
+	registry *registry.EndpointRegistry
 }
 
-type wsStarter struct {
-	factory *WebsocketConnectionFactory
-}
-
-func NewWSStarter(configuration WebsocketConnectionConfiguration) WSStarter {
+func NewWSStarter(configuration conf.WebsocketConnectionConfiguration) socket.WSStarter {
 	factory, err := NewWebSocketConnectionFactory(configuration)
 	if err != nil {
 		log.Panic("Configuration Error")
 	}
 
-	return &wsStarter{
-		factory: factory,
+	return &Starter{
+		factory:  factory,
+		registry: &registry.EndpointRegistry{},
 	}
 }
 
-func (starter *wsStarter) Handler(w http.ResponseWriter, r *http.Request) {
+func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
 	factory := starter.factory
 	conn, err := factory.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -64,4 +64,7 @@ func (starter *wsStarter) Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+}
+
+func (starter *Starter) AddEndPoint(endpoint string, handler socket.MessageHandler) {
 }

@@ -1,4 +1,4 @@
-package provider
+package conf
 
 const (
 	ReadBufferSize  = 1024
