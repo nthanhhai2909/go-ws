@@ -95,7 +95,7 @@ func (session *WebsocketSession) outboundInternal() {
 	for {
 		select {
 		case payload, ok := <-session.outbound:
-			//conn.SetWriteDeadline(time.Now().Add(writeWait))
+			//connection.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
 				conn.WriteMessage(websocket.CloseMessage, []byte{})

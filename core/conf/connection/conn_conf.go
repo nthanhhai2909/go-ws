@@ -1,11 +1,11 @@
-package conf
+package connection
 
 import (
 	"net/http"
 	"time"
 )
 
-type WebsocketConnectionConfiguration interface {
+type Configuration interface {
 	GetHandshakeTimeout() time.Duration
 	GetReadBufferSize() int
 	GetWriteBufferSize() int

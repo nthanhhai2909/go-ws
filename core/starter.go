@@ -13,8 +13,8 @@ type Starter struct {
 	factory *WebsocketConnectionFactory
 }
 
-func NewWSStarter(configuration conf.WebsocketConnectionConfiguration) *Starter {
-	factory, err := NewWebSocketConnectionFactory(configuration)
+func NewWSStarter(conf conf.Configuration) *Starter {
+	factory, err := NewWebSocketConnectionFactory(conf)
 	if err != nil {
 		log.Panic("Configuration Error")
 	}

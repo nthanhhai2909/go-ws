@@ -1,4 +1,4 @@
-package conf
+package connection
 
 const (
 	ReadBufferSize  = 1024

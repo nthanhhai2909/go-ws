@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/nthanhhai2909/go-commons-lang/sliceutils"
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
-	"log"
+	"mem-ws/core/conf/broker"
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/channel"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
@@ -20,16 +20,18 @@ import (
 type ProtocolHandler struct {
 	Decoder        *Decoder
 	Encoder        *Encoder
-	InboundChannel channel.Channel
-	OutboundChanel channel.Channel
+	InboundManager *channel.InboundManager
 }
 
-func NewProtocolHandler() subprotocol.ISubProtocolHandler {
+func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
+	ibManager := &channel.InboundManager{InboundMap: make(map[string]channel.Inbound)}
+	for _, destination := range registration.Destinations {
+		ibManager.InboundMap[destination] = &channel.Subscribable{Subscribers: make(map[string]session.ISession)}
+	}
 	return &ProtocolHandler{
 		Decoder:        &Decoder{},
 		Encoder:        &Encoder{},
-		InboundChannel: &channel.Subscribable{},
-		OutboundChanel: nil,
+		InboundManager: ibManager,
 	}
 }
 
@@ -41,6 +43,7 @@ func (h *ProtocolHandler) SupportProtocols() []string {
 func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, message message.IMessage) {
 	encoder := h.Encoder
 	decoder := h.Decoder
+	ibManager := h.InboundManager
 	msg, _ := decoder.Decode(message.GetPayload())
 	headers := msg.GetMessageHeaders()
 	destination := headers.GetHeader(constans.StompDestinationHeader)
@@ -55,6 +58,7 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 			return
 		}
 		session.SendMessage(encoder.Encode(smsg.Connected(stompVersion)))
+		// TODO HGA
 	case client.Send:
 		fmt.Println("destination: ", destination)
 		fmt.Println("msg: ", msg.GetPayload())
@@ -64,12 +68,29 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 				constans.StompContentTypeHeader: TextPlain,
 			}, []byte("Destination must not be null"))))
 		}
-
-		err := h.InboundChannel.Send(msg)
+	case client.Subscribe:
+		fmt.Println("Subscribe: ", destination)
+		fmt.Println("payload: ", msg.GetPayload())
+		fmt.Println("Holder: ", ibManager.InboundMap)
+		err := ibManager.Subscribe(destination, session)
 		if err != nil {
-			log.Fatal("Fail to send message to client")
+			// TODO HANDLER MESSAGE LATER
+			fmt.Println("hahahahah")
+			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
+			return
+		}
+	case client.Unsubscribe:
+		fmt.Println("Unsubscribe: ", destination)
+		fmt.Println("payload: ", msg.GetPayload())
+		fmt.Println("Holder: ", ibManager.InboundMap)
+		err := ibManager.UnSubscribe(destination, session)
+		if err != nil {
+			// TODO HANDLER MESSAGE LATER
+			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
+			return
 		}
 	}
+
 }
 
 // SendMessageToClient TODO IMPL - USE IN CASE SERVER ACTIVELY SEND MESSAGE TO CLIENT OR NOTIFICATION

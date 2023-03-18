@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/core/conf"
+	"mem-ws/core/conf/connection"
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp"
 	"mem-ws/native/handler"
@@ -22,25 +23,27 @@ type WebsocketConnectionFactory struct {
 	WebsocketHandler handler.IWebsocketHandler
 }
 
-func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
-	upgrader, err := initWebsocketUpgrader(configuration)
+func NewWebSocketConnectionFactory(conf conf.Configuration) (*WebsocketConnectionFactory, error) {
+	upgrader, err := initWebsocketUpgrader(conf.ConnectionConf)
 
 	if err != nil {
 		log.Panic("Invalid UpgradeConfiguration")
 		return nil, err
 	}
 	// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
+	// CURRENTLY ONLY SUPPORT STOMP
+	// TODO USE conf.BROKER
+	WebsocketHandler := &handler.NativeWebsocketHandler{
+		Sessions:           make(map[string]session.ISession),
+		SubProtocolHandler: stomp.NewProtocolHandler(conf.BrokerRegistry.StompBrokerRegistration),
+	}
 	return &WebsocketConnectionFactory{
-		WebsocketHandler: &handler.NativeWebsocketHandler{
-			Sessions: make(map[string]session.ISession),
-			// TODO SUPPORT INIT SUB-PROTOCOL BY CONFIGURATION
-			SubProtocolHandler: stomp.NewProtocolHandler(),
-		},
-		Upgrader: upgrader,
+		WebsocketHandler: WebsocketHandler,
+		Upgrader:         upgrader,
 	}, nil
 }
 
-func initWebsocketUpgrader(configuration conf.WebsocketConnectionConfiguration) (*websocket.Upgrader, error) {
+func initWebsocketUpgrader(configuration connection.Configuration) (*websocket.Upgrader, error) {
 	if configuration.GetReadBufferSize() <= 0 || configuration.GetWriteBufferSize() <= 0 {
 		return nil, errors.InvalidConfigurationError()
 	}
