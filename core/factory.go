@@ -1,10 +1,11 @@
-package stomp
+package core
 
 import (
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/core/conf"
 	"mem-ws/core/errors"
+	"mem-ws/core/subprotocols/stomp"
 	"mem-ws/native/handler"
 	"mem-ws/native/session"
 )
@@ -13,6 +14,7 @@ type WebsocketConnectionConfigurationError struct {
 	message string
 }
 
+// TODO SUPPORT CONFIGURATION SUB-PROTOCOL - CURRENT HARDCODE STOMP
 func (e WebsocketConnectionConfigurationError) Error() string { return e.message }
 
 type WebsocketConnectionFactory struct {
@@ -32,7 +34,7 @@ func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfigu
 		SubProtocolWebsocketHandler: &handler.NativeSubProtocolHandler{
 			Sessions: make(map[string]session.ISession),
 			// TODO SUPPORT INIT SUB-PROTOCOL BY CONFIGURATION
-			SubProtocolHandler: NewProtocolHandler(),
+			SubProtocolHandler: stomp.NewProtocolHandler(),
 		},
 		Upgrader: upgrader,
 	}, nil

@@ -1,10 +1,8 @@
-package stomp
+package core
 
 import (
 	"log"
-	"mem-ws/core"
 	"mem-ws/core/conf"
-	"mem-ws/core/subprotocols/stomp/registry"
 	error2 "mem-ws/native/enums"
 	"mem-ws/native/message"
 	"mem-ws/native/session"
@@ -12,19 +10,17 @@ import (
 )
 
 type Starter struct {
-	factory  *WebsocketConnectionFactory
-	registry *registry.EndpointRegistry
+	factory *WebsocketConnectionFactory
 }
 
-func NewWSStarter(configuration conf.WebsocketConnectionConfiguration) core.WSStarter {
+func NewWSStarter(configuration conf.WebsocketConnectionConfiguration) *Starter {
 	factory, err := NewWebSocketConnectionFactory(configuration)
 	if err != nil {
 		log.Panic("Configuration Error")
 	}
 
 	return &Starter{
-		factory:  factory,
-		registry: &registry.EndpointRegistry{},
+		factory: factory,
 	}
 }
 
@@ -66,7 +62,4 @@ func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-}
-
-func (starter *Starter) AddEndPoint(endpoint string, handler core.MessageHandler) {
 }
