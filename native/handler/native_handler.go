@@ -9,13 +9,13 @@ import (
 	"mem-ws/native/subprotocol"
 )
 
-// NativeSubProtocolHandler is used to support multiple Sub-protocol such as STOMP, AMQP, etc
-type NativeSubProtocolHandler struct {
+// NativeWebsocketHandler is used to support multiple Sub-protocol such as STOMP, AMQP, etc
+type NativeWebsocketHandler struct {
 	SubProtocolHandler subprotocol.ISubProtocolHandler
 	Sessions           map[string]session.ISession
 }
 
-func (h *NativeSubProtocolHandler) AfterConnectionEstablished(session session.ISession) error {
+func (h *NativeWebsocketHandler) AfterConnectionEstablished(session session.ISession) error {
 	sessionId := session.GetID()
 	if stringutils.IsBlank(sessionId) {
 		return argument.Create("Session ID must not be null")
@@ -24,20 +24,20 @@ func (h *NativeSubProtocolHandler) AfterConnectionEstablished(session session.IS
 	return nil
 }
 
-func (h *NativeSubProtocolHandler) HandleMessageFromClient(session session.ISession, message message.IMessage) error {
+func (h *NativeWebsocketHandler) HandleMessageFromClient(session session.ISession, message message.IMessage) error {
 	h.SubProtocolHandler.HandleMessageFromClient(session, message)
 	return nil
 }
 
-func (h *NativeSubProtocolHandler) HandleTransportError(session session.ISession, err error) error {
+func (h *NativeWebsocketHandler) HandleTransportError(session session.ISession, err error) error {
 	return nil
 }
 
-func (h *NativeSubProtocolHandler) AfterConnectionClosed(session session.ISession, status enums.CloseStatus) error {
+func (h *NativeWebsocketHandler) AfterConnectionClosed(session session.ISession, status enums.CloseStatus) error {
 	return session.Close()
 }
 
 // TODO HGA WILL RESEARCH LATER
-func (h *NativeSubProtocolHandler) SupportsPartialMessages() bool {
+func (h *NativeWebsocketHandler) SupportsPartialMessages() bool {
 	return false
 }

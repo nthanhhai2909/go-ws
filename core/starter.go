@@ -3,7 +3,7 @@ package core
 import (
 	"log"
 	"mem-ws/core/conf"
-	error2 "mem-ws/native/enums"
+	"mem-ws/native/enums"
 	"mem-ws/native/message"
 	"mem-ws/native/session"
 	"net/http"
@@ -31,7 +31,7 @@ func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
 		log.Println("upgrade:", err)
 		return
 	}
-	websocketHandler := factory.SubProtocolWebsocketHandler
+	websocketHandler := factory.WebsocketHandler
 	// TODO ALLOW SETUP TEXT AND BINARY SIZE
 	websocketSession := session.NewWebsocketSession(conn, 1024, 1024)
 	err = websocketHandler.AfterConnectionEstablished(websocketSession)
@@ -42,7 +42,7 @@ func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
 
 	defer func() {
 		// TODO HGA WILL PROCESS CLOSE STATUS LATER
-		err = websocketHandler.AfterConnectionClosed(websocketSession, error2.Normal)
+		err = websocketHandler.AfterConnectionClosed(websocketSession, enums.Normal)
 		if err != nil {
 			log.Println("Error when close connection")
 		}

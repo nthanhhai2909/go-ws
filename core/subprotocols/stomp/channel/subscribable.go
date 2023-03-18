@@ -1,7 +1,9 @@
 package channel
 
 import (
+	"fmt"
 	"mem-ws/core/subprotocols/stomp/broker"
+	"mem-ws/core/subprotocols/stomp/constans"
 	"mem-ws/core/subprotocols/stomp/smsg"
 )
 
@@ -18,5 +20,8 @@ func (chann *Subscribable) Unsubscribe(handler smsg.Handler) error {
 }
 
 func (chann *Subscribable) Send(message smsg.IMessage) error {
+	fmt.Println("Call tao nek: ", message)
+	fmt.Println(message.GetMessageHeaders().GetHeader(constans.CommandHeader))
+	fmt.Println(message.GetMessageHeaders().GetHeader(constans.StompDestinationHeader))
 	return nil
 }

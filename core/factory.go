@@ -18,8 +18,8 @@ type WebsocketConnectionConfigurationError struct {
 func (e WebsocketConnectionConfigurationError) Error() string { return e.message }
 
 type WebsocketConnectionFactory struct {
-	Upgrader                    *websocket.Upgrader
-	SubProtocolWebsocketHandler handler.IWebsocketHandler
+	Upgrader         *websocket.Upgrader
+	WebsocketHandler handler.IWebsocketHandler
 }
 
 func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfiguration) (*WebsocketConnectionFactory, error) {
@@ -31,7 +31,7 @@ func NewWebSocketConnectionFactory(configuration conf.WebsocketConnectionConfigu
 	}
 	// TODO HGA WILL ADAPT TO CREATE BY CONFIGURATION
 	return &WebsocketConnectionFactory{
-		SubProtocolWebsocketHandler: &handler.NativeSubProtocolHandler{
+		WebsocketHandler: &handler.NativeWebsocketHandler{
 			Sessions: make(map[string]session.ISession),
 			// TODO SUPPORT INIT SUB-PROTOCOL BY CONFIGURATION
 			SubProtocolHandler: stomp.NewProtocolHandler(),

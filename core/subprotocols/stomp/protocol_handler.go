@@ -29,7 +29,6 @@ func NewProtocolHandler() subprotocol.ISubProtocolHandler {
 		Decoder:        &Decoder{},
 		Encoder:        &Encoder{},
 		InboundChannel: &channel.Subscribable{},
-		// TODO HGA WILL DO IT
 		OutboundChanel: nil,
 	}
 }
@@ -38,7 +37,7 @@ func (h *ProtocolHandler) SupportProtocols() []string {
 	return constans.SupportVersion
 }
 
-// TODO BROKER PROCESS
+// HandleMessageFromClient TODO BROKER PROCESS
 func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, message message.IMessage) {
 	encoder := h.Encoder
 	decoder := h.Decoder
@@ -47,7 +46,6 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 	destination := headers.GetHeader(constans.StompDestinationHeader)
 	switch headers.GetHeader(constans.CommandHeader) {
 	case client.Connect:
-		// TODO BROKER PROCESS
 		stompVersion, err := commonVersionUse(headers.GetHeader(constans.StompAcceptVersionHeader))
 		if err != nil {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
@@ -58,20 +56,23 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 		}
 		session.SendMessage(encoder.Encode(smsg.Connected(stompVersion)))
 	case client.Send:
+		fmt.Println("destination: ", destination)
+		fmt.Println("msg: ", msg.GetPayload())
 		if stringutils.IsBlank(destination) {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
 				constans.StompVersionHeader:     constans.SupportVersionInString,
 				constans.StompContentTypeHeader: TextPlain,
 			}, []byte("Destination must not be null"))))
 		}
+
 		err := h.InboundChannel.Send(msg)
 		if err != nil {
-			// TODO HGA WILL PROCESS IN CASE FAILED
 			log.Fatal("Fail to send message to client")
 		}
 	}
 }
 
+// SendMessageToClient TODO IMPL - USE IN CASE SERVER ACTIVELY SEND MESSAGE TO CLIENT OR NOTIFICATION
 func (h *ProtocolHandler) SendMessageToClient(session session.ISession, message smsg.IMessage) {
 }
 
