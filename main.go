@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mem-ws/socket/core/conf"
-	"mem-ws/socket/core/stomp"
+	"mem-ws/core/conf"
+	"mem-ws/core/subprotocols/stomp"
 	"net/http"
 )
 
