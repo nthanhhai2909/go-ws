@@ -1,7 +1,7 @@
 package broker
 
 type MessageBrokerRegistry struct {
-	ApplicationDestinationPrefixes []string
-	StompBrokerRegistration        *StompBrokerRegistration
-	InMemoryBrokerRegistration     *InMemoryBrokerRegistration
+	ApplicationDestinationPrefix string
+	StompBrokerRegistration      *StompBrokerRegistration
+	InMemoryBrokerRegistration   *InMemoryBrokerRegistration
 }

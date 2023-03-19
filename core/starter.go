@@ -1,6 +1,8 @@
 package core
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"mem-ws/core/conf"
 	"mem-ws/native/enums"
@@ -9,8 +11,11 @@ import (
 	"net/http"
 )
 
+var addr = flag.String("addr", "localhost:8999", "http service address")
+
 type Starter struct {
 	factory *WebsocketConnectionFactory
+	conf    conf.Configuration
 }
 
 func NewWSStarter(conf conf.Configuration) *Starter {
@@ -21,7 +26,14 @@ func NewWSStarter(conf conf.Configuration) *Starter {
 
 	return &Starter{
 		factory: factory,
+		conf:    conf,
 	}
+}
+
+func (starter *Starter) Start() {
+	http.HandleFunc(starter.conf.BrokerRegistry.ApplicationDestinationPrefix, starter.Handler)
+	fmt.Println("Server start listening at: localhost:8999")
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
 
 func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
