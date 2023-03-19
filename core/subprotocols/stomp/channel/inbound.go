@@ -6,7 +6,7 @@ import (
 )
 
 type Inbound interface {
-	Subscribe(session session.ISession) error
-	Unsubscribe(session session.ISession) error
+	Subscribe(subscribeId string, session session.ISession) error
+	Unsubscribe(subscribeId string, session session.ISession) error
 	Send(message smsg.IMessage) error
 }

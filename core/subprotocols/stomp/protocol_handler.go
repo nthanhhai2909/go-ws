@@ -26,7 +26,7 @@ type ProtocolHandler struct {
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
 	ibManager := &channel.InboundManager{InboundMap: make(map[string]channel.Inbound)}
 	for _, destination := range registration.Destinations {
-		ibManager.InboundMap[destination] = &channel.Subscribable{Subscribers: make(map[string]session.ISession)}
+		ibManager.InboundMap[destination] = &channel.Subscribable{Subscribers: make(map[channel.SubscriberKey]session.ISession)}
 	}
 	return &ProtocolHandler{
 		Decoder:        &Decoder{},
@@ -68,22 +68,23 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 				constans.StompContentTypeHeader: TextPlain,
 			}, []byte("Destination must not be null"))))
 		}
+		ibManager.Send(destination, msg)
 	case client.Subscribe:
+		subscribeId := headers.GetHeader(constans.StompIdHeader)
 		fmt.Println("Subscribe: ", destination)
 		fmt.Println("payload: ", msg.GetPayload())
 		fmt.Println("Holder: ", ibManager.InboundMap)
-		err := ibManager.Subscribe(destination, session)
+		err := ibManager.Subscribe(destination, subscribeId, session)
 		if err != nil {
 			// TODO HANDLER MESSAGE LATER
-			fmt.Println("hahahahah")
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
 			return
 		}
 	case client.Unsubscribe:
-		fmt.Println("Unsubscribe: ", destination)
+		subscribeId := headers.GetHeader(constans.StompIdHeader)
 		fmt.Println("payload: ", msg.GetPayload())
 		fmt.Println("Holder: ", ibManager.InboundMap)
-		err := ibManager.UnSubscribe(destination, session)
+		err := ibManager.UnSubscribe(subscribeId, session)
 		if err != nil {
 			// TODO HANDLER MESSAGE LATER
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
