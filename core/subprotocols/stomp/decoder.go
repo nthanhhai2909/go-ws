@@ -3,9 +3,9 @@ package stomp
 import (
 	"bytes"
 	"mem-ws/core/errors"
-	"mem-ws/core/header"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
 	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/header"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"strings"
 )
@@ -25,7 +25,7 @@ func (d *Decoder) Decode(buff []byte) (smsg.IMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	headers.AddHeader(constans.CommandHeader, command.Type)
+	headers.AddHeader(header.Command, command.Type)
 	payload, err := d.readPayload(buffer)
 	if err != nil {
 		return nil, err
@@ -54,7 +54,7 @@ func (d *Decoder) readCommand(buffer *bytes.Buffer) (*client.Command, error) {
 	return client.ToCommand(comm.String()), nil
 }
 
-func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Headers, error) {
+func (d *Decoder) readHeaders(buffer *bytes.Buffer) (*header.Header, error) {
 	headers := header.EmptyHeader()
 	for {
 		headerItem := bytes.NewBuffer(make([]byte, 0))

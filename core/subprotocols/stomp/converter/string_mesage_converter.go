@@ -1,7 +1,7 @@
 package converter
 
 import (
-	"mem-ws/core/header"
+	"mem-ws/core/subprotocols/stomp/header"
 	"mem-ws/core/subprotocols/stomp/smsg"
 )
 
@@ -12,6 +12,6 @@ func (converter *stringMessageConverter[P]) FromMessage(msg smsg.IMessage, targe
 	return nil
 }
 
-func (converter *stringMessageConverter[P]) ToMessage(payload P, headers header.Headers) (error, smsg.IMessage) {
+func (converter *stringMessageConverter[P]) ToMessage(payload P, headers header.Header) (error, smsg.IMessage) {
 	return nil, nil
 }

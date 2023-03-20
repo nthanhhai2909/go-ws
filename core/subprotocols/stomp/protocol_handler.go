@@ -6,9 +6,11 @@ import (
 	"github.com/nthanhhai2909/go-commons-lang/stringutils"
 	"mem-ws/core/conf/broker"
 	"mem-ws/core/errors"
-	"mem-ws/core/subprotocols/stomp/channel"
+	"mem-ws/core/subprotocols/stomp/channel/inbound"
+	"mem-ws/core/subprotocols/stomp/channel/inbound/subscriber"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
 	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/header"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"mem-ws/native/message"
 	"mem-ws/native/session"
@@ -20,13 +22,13 @@ import (
 type ProtocolHandler struct {
 	Decoder        *Decoder
 	Encoder        *Encoder
-	InboundManager *channel.InboundManager
+	InboundManager *inbound.InboundManager
 }
 
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
-	ibManager := &channel.InboundManager{InboundMap: make(map[string]channel.Inbound)}
+	ibManager := &inbound.InboundManager{InboundMap: make(map[string]inbound.IChannel)}
 	for _, destination := range registration.Destinations {
-		ibManager.InboundMap[destination] = &channel.Subscribable{Subscribers: make(map[channel.SubscriberKey]session.ISession)}
+		ibManager.InboundMap[destination] = &inbound.Subscribable{Subscribers: make(map[subscriber.Key]subscriber.Context)}
 	}
 	return &ProtocolHandler{
 		Decoder:        &Decoder{},
@@ -46,14 +48,14 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 	ibManager := h.InboundManager
 	msg, _ := decoder.Decode(message.GetPayload())
 	headers := msg.GetMessageHeaders()
-	destination := headers.GetHeader(constans.StompDestinationHeader)
-	switch headers.GetHeader(constans.CommandHeader) {
+	destination := headers.Destination()
+	switch headers.Command() {
 	case client.Connect:
-		stompVersion, err := commonVersionUse(headers.GetHeader(constans.StompAcceptVersionHeader))
+		stompVersion, err := commonVersionUse(headers.AcceptVersion())
 		if err != nil {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
-				constans.StompVersionHeader:     constans.SupportVersionInString,
-				constans.StompContentTypeHeader: TextPlain,
+				header.StompVersion:     constans.SupportVersionInString,
+				header.StompContentType: TextPlain,
 			}, []byte(err.Error()))))
 			return
 		}
@@ -64,32 +66,27 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 		fmt.Println("msg: ", msg.GetPayload())
 		if stringutils.IsBlank(destination) {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
-				constans.StompVersionHeader:     constans.SupportVersionInString,
-				constans.StompContentTypeHeader: TextPlain,
+				header.StompVersion:     constans.SupportVersionInString,
+				header.StompContentType: TextPlain,
 			}, []byte("Destination must not be null"))))
 		}
 		ibManager.Send(destination, msg)
 	case client.Subscribe:
-		subscribeId := headers.GetHeader(constans.StompIdHeader)
-		fmt.Println("Subscribe: ", destination)
-		fmt.Println("payload: ", msg.GetPayload())
-		fmt.Println("Holder: ", ibManager.InboundMap)
-		err := ibManager.Subscribe(destination, subscribeId, session)
+		err := ibManager.Subscribe(msg, session)
 		if err != nil {
 			// TODO HANDLER MESSAGE LATER
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
 			return
 		}
+
 	case client.Unsubscribe:
-		subscribeId := headers.GetHeader(constans.StompIdHeader)
-		fmt.Println("payload: ", msg.GetPayload())
-		fmt.Println("Holder: ", ibManager.InboundMap)
-		err := ibManager.UnSubscribe(subscribeId, session)
+		err := ibManager.UnSubscribe(msg, session)
 		if err != nil {
 			// TODO HANDLER MESSAGE LATER
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
 			return
 		}
+
 	}
 
 }

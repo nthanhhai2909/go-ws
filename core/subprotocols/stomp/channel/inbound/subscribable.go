@@ -1,38 +1,37 @@
-package channel
+package inbound
 
 import (
 	"fmt"
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/broker"
-	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/channel/inbound/subscriber"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"mem-ws/native/session"
 )
 
 type Subscribable struct {
 	Broker      broker.Broker
-	Subscribers map[SubscriberKey]session.ISession
+	Subscribers map[subscriber.Key]subscriber.Context
 }
 
-type SubscriberKey struct {
-	SessionID   string
-	SubscribeID string
-}
-
-func (chann *Subscribable) Subscribe(subscribeId string, session session.ISession) error {
+func (chann *Subscribable) Subscribe(msg smsg.IMessage, session session.ISession) error {
 	sessionId := session.GetID()
-	key := SubscriberKey{SubscribeID: subscribeId, SessionID: sessionId}
+	headers := msg.GetMessageHeaders()
+	subscribeId := headers.ID()
+	fmt.Println("ACK: ", headers.Ack())
+	key := subscriber.Key{SubscribeID: subscribeId, SessionID: sessionId}
 	if _, ok := chann.Subscribers[key]; ok {
 		return errors.IllegalArgument{Message: "Session already exists!"}
 	}
-	chann.Subscribers[key] = session
+	chann.Subscribers[key] = subscriber.Context{Ack: headers.Ack(), Session: session}
 	fmt.Println("Subscribe: ", chann.Subscribers)
 	return nil
 }
 
-func (chann *Subscribable) Unsubscribe(subscribeId string, session session.ISession) error {
+func (chann *Subscribable) Unsubscribe(msg smsg.IMessage, session session.ISession) error {
 	sessionId := session.GetID()
-	key := SubscriberKey{SubscribeID: subscribeId, SessionID: sessionId}
+	subscribeId := msg.GetMessageHeaders().ID()
+	key := subscriber.Key{SubscribeID: subscribeId, SessionID: sessionId}
 	if _, ok := chann.Subscribers[key]; !ok {
 		return errors.IllegalArgument{Message: "Session does not exist!"}
 	}
@@ -42,8 +41,6 @@ func (chann *Subscribable) Unsubscribe(subscribeId string, session session.ISess
 }
 
 func (chann *Subscribable) Send(message smsg.IMessage) error {
-	fmt.Println(message.GetMessageHeaders().GetHeader(constans.CommandHeader))
-	fmt.Println(message.GetMessageHeaders().GetHeader(constans.StompDestinationHeader))
 	fmt.Println(string(message.GetPayload()))
 	return nil
 }

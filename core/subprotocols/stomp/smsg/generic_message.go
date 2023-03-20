@@ -1,18 +1,18 @@
 package smsg
 
 import (
-	"mem-ws/core/header"
+	"mem-ws/core/subprotocols/stomp/header"
 )
 
 type GenericMessage[P interface{}] struct {
 	Payload P
-	Headers *header.Headers
+	Headers *header.Header
 }
 
 func (msg *GenericMessage[P]) GetPayload() P {
 	return msg.Payload
 }
 
-func (msg *GenericMessage[P]) GetMessageHeaders() *header.Headers {
+func (msg *GenericMessage[P]) GetMessageHeaders() *header.Header {
 	return msg.Headers
 }

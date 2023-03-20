@@ -1,21 +1,20 @@
 package smsg
 
 import (
-	"mem-ws/core/header"
 	"mem-ws/core/subprotocols/stomp/cmd/server"
-	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/header"
 )
 
 type err struct {
-	headers *header.Headers
+	headers *header.Header
 	payload []byte
 }
 
 func Error(headerProperties map[string]string, payload []byte) IMessage {
 	headerInit := header.EmptyHeader()
-	headerInit.AddHeader(constans.CommandHeader, server.Error)
+	headerInit.AddHeader(header.Command, server.Error)
 	for key, ele := range headerProperties {
-		if constans.CommandHeader == key {
+		if header.Command == key {
 			continue
 		}
 		headerInit.AddHeader(key, ele)
@@ -27,6 +26,6 @@ func (msg *err) GetPayload() []byte {
 	return msg.payload
 }
 
-func (msg *err) GetMessageHeaders() *header.Headers {
+func (msg *err) GetMessageHeaders() *header.Header {
 	return msg.headers
 }
