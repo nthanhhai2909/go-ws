@@ -5,5 +5,5 @@ import (
 )
 
 type DestinationResolver[P interface{}] interface {
-	ResolveDestination(message smsg.IMessage[P]) DestinationResult
+	ResolveDestination(message smsg.IMessage) DestinationResult
 }
