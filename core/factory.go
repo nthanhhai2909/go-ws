@@ -8,7 +8,7 @@ import (
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp"
 	"mem-ws/native/handler"
-	"mem-ws/native/session"
+	"sync"
 )
 
 type WebsocketConnectionConfigurationError struct {
@@ -34,7 +34,7 @@ func NewWebSocketConnectionFactory(conf conf.Configuration) (*WebsocketConnectio
 	// CURRENTLY ONLY SUPPORT STOMP
 	// TODO USE conf.BROKER
 	WebsocketHandler := &handler.NativeWebsocketHandler{
-		Sessions:           make(map[string]session.ISession),
+		Sessions:           sync.Map{},
 		SubProtocolHandler: stomp.NewProtocolHandler(conf.BrokerRegistry.StompBrokerRegistration),
 	}
 	return &WebsocketConnectionFactory{

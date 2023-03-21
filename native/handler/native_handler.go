@@ -7,20 +7,22 @@ import (
 	"mem-ws/native/message"
 	"mem-ws/native/session"
 	"mem-ws/native/subprotocol"
+	"sync"
 )
 
 // NativeWebsocketHandler is used to support multiple Sub-protocol such as STOMP, AMQP, etc
 type NativeWebsocketHandler struct {
 	SubProtocolHandler subprotocol.ISubProtocolHandler
-	Sessions           map[string]session.ISession
+	Sessions           sync.Map
 }
 
 func (h *NativeWebsocketHandler) AfterConnectionEstablished(session session.ISession) error {
 	sessionId := session.GetID()
+
 	if stringutils.IsBlank(sessionId) {
 		return argument.Create("Session ID must not be null")
 	}
-	h.Sessions[sessionId] = session
+	h.Sessions.Store(sessionId, session)
 	return nil
 }
 

@@ -7,7 +7,6 @@ import (
 	"mem-ws/core/conf/broker"
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/channel/inbound"
-	"mem-ws/core/subprotocols/stomp/channel/inbound/subscriber"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
 	"mem-ws/core/subprotocols/stomp/constans"
 	"mem-ws/core/subprotocols/stomp/header"
@@ -16,6 +15,7 @@ import (
 	"mem-ws/native/session"
 	"mem-ws/native/subprotocol"
 	"strings"
+	"sync"
 )
 
 // ProtocolHandler - socket.IWebsocketHandler Implementation
@@ -28,7 +28,7 @@ type ProtocolHandler struct {
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
 	ibManager := &inbound.InboundManager{InboundMap: make(map[string]inbound.IChannel)}
 	for _, destination := range registration.Destinations {
-		ibManager.InboundMap[destination] = &inbound.Subscribable{Subscribers: make(map[subscriber.Key]subscriber.Context)}
+		ibManager.InboundMap[destination] = &inbound.Subscribable{Subscribers: sync.Map{}}
 	}
 	return &ProtocolHandler{
 		Decoder:        &Decoder{},

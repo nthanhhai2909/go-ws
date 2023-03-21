@@ -7,24 +7,24 @@ import (
 	"mem-ws/core/subprotocols/stomp/channel/inbound/subscriber"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"mem-ws/native/session"
+	"sync"
 )
 
 type Subscribable struct {
 	Broker      broker.Broker
-	Subscribers map[subscriber.Key]subscriber.Context
+	Subscribers sync.Map
 }
 
 func (chann *Subscribable) Subscribe(msg smsg.IMessage, session session.ISession) error {
 	sessionId := session.GetID()
 	headers := msg.GetMessageHeaders()
 	subscribeId := headers.ID()
-	fmt.Println("ACK: ", headers.Ack())
 	key := subscriber.Key{SubscribeID: subscribeId, SessionID: sessionId}
-	if _, ok := chann.Subscribers[key]; ok {
+
+	if _, ok := chann.Subscribers.Load(key); ok {
 		return errors.IllegalArgument{Message: "Session already exists!"}
 	}
-	chann.Subscribers[key] = subscriber.Context{Ack: headers.Ack(), Session: session}
-	fmt.Println("Subscribe: ", chann.Subscribers)
+	chann.Subscribers.Store(key, subscriber.Context{Ack: headers.Ack(), Session: session})
 	return nil
 }
 
@@ -32,11 +32,11 @@ func (chann *Subscribable) Unsubscribe(msg smsg.IMessage, session session.ISessi
 	sessionId := session.GetID()
 	subscribeId := msg.GetMessageHeaders().ID()
 	key := subscriber.Key{SubscribeID: subscribeId, SessionID: sessionId}
-	if _, ok := chann.Subscribers[key]; !ok {
+	if _, ok := chann.Subscribers.Load(key); !ok {
 		return errors.IllegalArgument{Message: "Session does not exist!"}
 	}
-	delete(chann.Subscribers, key)
-	fmt.Println("Unsubscribe: ", chann.Subscribers)
+
+	chann.Subscribers.Delete(key)
 	return nil
 }
 
