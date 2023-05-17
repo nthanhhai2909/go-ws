@@ -1,10 +1,10 @@
-package stomp
+package codec
 
 import (
 	"bytes"
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
-	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/constants"
 	"mem-ws/core/subprotocols/stomp/header"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"strings"
@@ -30,7 +30,7 @@ func (d *Decoder) Decode(buff []byte) (smsg.IMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &smsg.GenericMessage[[]byte]{
+	return &smsg.GenericMessage{
 		Headers: headers,
 		Payload: payload,
 	}, nil
@@ -85,7 +85,7 @@ func (d *Decoder) readPayload(buffer *bytes.Buffer) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		if ch == constans.TerminalByte {
+		if ch == constants.TerminalByte {
 			break
 		}
 		payload = append(payload, ch)

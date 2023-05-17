@@ -4,7 +4,7 @@ const (
 	StompId            = "id"
 	StompHost          = "host"
 	StompAcceptVersion = "accept-version"
-	StompMessageId     = "smsg-id"
+	StompMessageId     = "message-id"
 	StompReceipt       = "receipt"
 	StompReceiptId     = "receipt-id"
 	StompSubscription  = "subscription"

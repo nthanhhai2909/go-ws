@@ -2,6 +2,6 @@ package server
 
 const (
 	Connected string = "CONNECTED"
-	Send      string = "SEND"
+	Message   string = "MESSAGE"
 	Error     string = "ERROR"
 )

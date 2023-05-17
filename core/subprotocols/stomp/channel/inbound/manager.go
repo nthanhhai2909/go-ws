@@ -5,15 +5,16 @@ import (
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"mem-ws/native/session"
+	"sync"
 )
 
 // InboundManager TODO PROCESS CONCURRENCY HERE
 // ENHANCE PERFORMANCE FOR UNSUBSCRIBE FLOW
 type InboundManager struct {
-	InboundMap map[string]IChannel
+	InboundMap sync.Map
 }
 
-// TODO ALLOW USER CAN REGISTER HANDLER FOR DESTINATION SPECIFICLY
+// Send it can be send to specific user or group Subscribers
 func (m *InboundManager) Send(destination string, message smsg.IMessage) error {
 	if stringutils.IsBlank(destination) {
 		return errors.IllegalArgument{Message: "Destination must not be null"}
@@ -22,23 +23,26 @@ func (m *InboundManager) Send(destination string, message smsg.IMessage) error {
 	if message == nil {
 		return errors.IllegalArgument{Message: "Message must not be null"}
 	}
-
-	// TODO WORK WITH SEND METHOD
-
-	return errors.IllegalArgument{Message: "Invalid Destination"}
+	val, ok := m.InboundMap.Load(message.GetMessageHeaders().Destination())
+	if !ok {
+		return errors.IllegalArgument{Message: "Destination could not be found"}
+	}
+	val.(IChannel).Send(message)
+	return nil
 }
 
 func (m *InboundManager) Subscribe(msg smsg.IMessage, session session.ISession) error {
-	if chann, ok := m.InboundMap[msg.GetMessageHeaders().Destination()]; ok {
-		return chann.Subscribe(msg, session)
+	if val, ok := m.InboundMap.Load(msg.GetMessageHeaders().Destination()); ok {
+		return val.(IChannel).Subscribe(msg, session)
 	}
 
 	return errors.IllegalArgument{Message: "Invalid Destination"}
 }
 
 func (m *InboundManager) UnSubscribe(msg smsg.IMessage, session session.ISession) error {
-	for _, inboud := range m.InboundMap {
-		inboud.Unsubscribe(msg, session)
-	}
+	m.InboundMap.Range(func(key, value any) bool {
+		value.(IChannel).Unsubscribe(msg, session)
+		return true
+	})
 	return nil
 }

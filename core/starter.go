@@ -44,7 +44,6 @@ func (starter *Starter) Handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	websocketHandler := factory.WebsocketHandler
-	// TODO ALLOW SETUP TEXT AND BINARY SIZE
 	websocketSession := session.NewWebsocketSession(conn, 1024, 1024)
 	err = websocketHandler.AfterConnectionEstablished(websocketSession)
 	if err != nil {

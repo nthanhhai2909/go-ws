@@ -1,11 +1,13 @@
 package session
 
 import (
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"log"
 	"mem-ws/native/message"
 	"net/http"
+	"time"
 )
 
 type WebsocketSession struct {
@@ -78,10 +80,10 @@ func (session *WebsocketSession) IsOpen() bool {
 
 func (session *WebsocketSession) Close() error {
 	err := session.conn.Close()
+	close(session.outbound)
 	return err
 }
 
-// outboundInternal - process messagetype
 func (session *WebsocketSession) outboundInternal() {
 
 	conn := session.conn
@@ -95,9 +97,9 @@ func (session *WebsocketSession) outboundInternal() {
 	for {
 		select {
 		case payload, ok := <-session.outbound:
-			//connection.SetWriteDeadline(time.Now().Add(writeWait))
+			conn.SetWriteDeadline(time.Now().Add(time.Second * 10))
 			if !ok {
-				// The hub closed the channel.
+				fmt.Println("Close Connection")
 				conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}

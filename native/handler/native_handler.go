@@ -20,6 +20,7 @@ func (h *NativeWebsocketHandler) AfterConnectionEstablished(session session.ISes
 	sessionId := session.GetID()
 
 	if stringutils.IsBlank(sessionId) {
+		// TODO HGA WILL REPLACE WITH NATIVE ERROR
 		return argument.Create("Session ID must not be null")
 	}
 	h.Sessions.Store(sessionId, session)

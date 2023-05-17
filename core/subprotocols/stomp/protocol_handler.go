@@ -8,7 +8,9 @@ import (
 	"mem-ws/core/errors"
 	"mem-ws/core/subprotocols/stomp/channel/inbound"
 	"mem-ws/core/subprotocols/stomp/cmd/client"
-	"mem-ws/core/subprotocols/stomp/constans"
+	"mem-ws/core/subprotocols/stomp/cmd/server"
+	"mem-ws/core/subprotocols/stomp/codec"
+	"mem-ws/core/subprotocols/stomp/constants"
 	"mem-ws/core/subprotocols/stomp/header"
 	"mem-ws/core/subprotocols/stomp/smsg"
 	"mem-ws/native/message"
@@ -20,25 +22,25 @@ import (
 
 // ProtocolHandler - socket.IWebsocketHandler Implementation
 type ProtocolHandler struct {
-	Decoder        *Decoder
-	Encoder        *Encoder
+	Decoder        *codec.Decoder
+	Encoder        *codec.Encoder
 	InboundManager *inbound.InboundManager
 }
 
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
-	ibManager := &inbound.InboundManager{InboundMap: make(map[string]inbound.IChannel)}
+	ibManager := &inbound.InboundManager{InboundMap: sync.Map{}}
 	for _, destination := range registration.Destinations {
-		ibManager.InboundMap[destination] = &inbound.Subscribable{Subscribers: sync.Map{}}
+		ibManager.InboundMap.Store(destination, &inbound.Subscribable{Subscribers: sync.Map{}})
 	}
 	return &ProtocolHandler{
-		Decoder:        &Decoder{},
-		Encoder:        &Encoder{},
+		Decoder:        &codec.Decoder{},
+		Encoder:        &codec.Encoder{},
 		InboundManager: ibManager,
 	}
 }
 
 func (h *ProtocolHandler) SupportProtocols() []string {
-	return constans.SupportVersion
+	return constants.SupportVersion
 }
 
 // HandleMessageFromClient TODO BROKER PROCESS
@@ -49,25 +51,24 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 	msg, _ := decoder.Decode(message.GetPayload())
 	headers := msg.GetMessageHeaders()
 	destination := headers.Destination()
-	switch headers.Command() {
+	cmd := headers.Command()
+	switch cmd {
 	case client.Connect:
 		stompVersion, err := commonVersionUse(headers.AcceptVersion())
 		if err != nil {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
-				header.StompVersion:     constans.SupportVersionInString,
-				header.StompContentType: TextPlain,
+				header.StompVersion:     constants.SupportVersionInString,
+				header.StompContentType: constants.TextPlain,
 			}, []byte(err.Error()))))
 			return
 		}
 		session.SendMessage(encoder.Encode(smsg.Connected(stompVersion)))
-		// TODO HGA
 	case client.Send:
-		fmt.Println("destination: ", destination)
-		fmt.Println("msg: ", msg.GetPayload())
 		if stringutils.IsBlank(destination) {
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{
-				header.StompVersion:     constans.SupportVersionInString,
-				header.StompContentType: TextPlain,
+				header.StompVersion:       constants.SupportVersionInString,
+				header.StompDestination:   destination,
+				header.StompContentLength: constants.TextPlain,
 			}, []byte("Destination must not be null"))))
 		}
 		ibManager.Send(destination, msg)
@@ -78,6 +79,12 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
 			return
 		}
+		session.SendMessage(encoder.Encode(smsg.NewGenericMessage(map[string]string{
+			header.Command:           server.Message,
+			header.StompDestination:  msg.GetMessageHeaders().Destination(),
+			header.StompContentType:  constants.TextPlain,
+			header.StompSubscription: msg.GetMessageHeaders().ID(),
+		}, []byte("Welcome to VN"))))
 
 	case client.Unsubscribe:
 		err := ibManager.UnSubscribe(msg, session)
@@ -86,7 +93,6 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 			session.SendMessage(encoder.Encode(smsg.Error(map[string]string{}, []byte(err.Error()))))
 			return
 		}
-
 	}
 
 }
@@ -103,10 +109,10 @@ func commonVersionUse(clientAcceptVersion string) (string, error) {
 		clientVersions = strings.Split(clientAcceptVersion, ",")
 	}
 
-	commons := sliceutils.Union(clientVersions, constans.SupportVersion)
+	commons := sliceutils.Union(clientVersions, constants.SupportVersion)
 
 	if sliceutils.IsEmpty(commons) {
-		return stringutils.EMPTY, errors.MessageConversion{Message: fmt.Sprintf("Supported protocol versions are %s", constans.SupportVersionInString)}
+		return stringutils.EMPTY, errors.MessageConversion{Message: fmt.Sprintf("Supported protocol versions are %s", constants.SupportVersionInString)}
 	}
 	return commons[0], nil
 }
