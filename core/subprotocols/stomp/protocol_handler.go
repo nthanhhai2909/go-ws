@@ -30,7 +30,7 @@ type ProtocolHandler struct {
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
 	ibManager := &inbound.InboundManager{InboundMap: sync.Map{}}
 	for _, destination := range registration.Destinations {
-		ibManager.InboundMap.Store(destination, &inbound.Subscribable{Subscribers: sync.Map{}})
+		ibManager.InboundMap.Store(destination, &inbound.Subscribable{Subscribers: &sync.Map{}})
 	}
 	return &ProtocolHandler{
 		Decoder:        &codec.Decoder{},
