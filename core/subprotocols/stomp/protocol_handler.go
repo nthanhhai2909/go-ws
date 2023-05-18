@@ -24,11 +24,11 @@ import (
 type ProtocolHandler struct {
 	Decoder        *codec.Decoder
 	Encoder        *codec.Encoder
-	InboundManager *inbound.InboundManager
+	InboundManager *inbound.Manager
 }
 
 func NewProtocolHandler(registration *broker.StompBrokerRegistration) subprotocol.ISubProtocolHandler {
-	ibManager := &inbound.InboundManager{InboundMap: sync.Map{}}
+	ibManager := &inbound.Manager{InboundMap: sync.Map{}}
 	for _, destination := range registration.Destinations {
 		ibManager.InboundMap.Store(destination, &inbound.Subscribable{Subscribers: &sync.Map{}})
 	}
@@ -101,6 +101,12 @@ func (h *ProtocolHandler) HandleMessageFromClient(session session.ISession, mess
 func (h *ProtocolHandler) SendMessageToClient(session session.ISession, message smsg.IMessage) {
 }
 
+func (h *ProtocolHandler) HandleConnectionClose(session session.ISession) {
+	err := h.InboundManager.HandleConnectionClose(session)
+	if err != nil {
+		// TODO HGA
+	}
+}
 func commonVersionUse(clientAcceptVersion string) (string, error) {
 	var clientVersions []string
 	if stringutils.IsBlank(clientAcceptVersion) {

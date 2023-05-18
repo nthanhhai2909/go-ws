@@ -8,14 +8,14 @@ import (
 	"sync"
 )
 
-// InboundManager TODO PROCESS CONCURRENCY HERE
+// Manager TODO PROCESS CONCURRENCY HERE
 // ENHANCE PERFORMANCE FOR UNSUBSCRIBE FLOW
-type InboundManager struct {
+type Manager struct {
 	InboundMap sync.Map
 }
 
 // Send it can be send to specific user or group Subscribers
-func (m *InboundManager) Send(destination string, message smsg.IMessage) error {
+func (m *Manager) Send(destination string, message smsg.IMessage) error {
 	if stringutils.IsBlank(destination) {
 		return errors.IllegalArgument{Message: "Destination must not be null"}
 	}
@@ -31,7 +31,7 @@ func (m *InboundManager) Send(destination string, message smsg.IMessage) error {
 	return nil
 }
 
-func (m *InboundManager) Subscribe(msg smsg.IMessage, session session.ISession) error {
+func (m *Manager) Subscribe(msg smsg.IMessage, session session.ISession) error {
 	if val, ok := m.InboundMap.Load(msg.GetMessageHeaders().Destination()); ok {
 		return val.(IChannel).Subscribe(msg, session)
 	}
@@ -39,9 +39,17 @@ func (m *InboundManager) Subscribe(msg smsg.IMessage, session session.ISession) 
 	return errors.IllegalArgument{Message: "Invalid Destination"}
 }
 
-func (m *InboundManager) UnSubscribe(msg smsg.IMessage, session session.ISession) error {
+func (m *Manager) UnSubscribe(msg smsg.IMessage, session session.ISession) error {
 	m.InboundMap.Range(func(key, value any) bool {
 		value.(IChannel).Unsubscribe(msg, session)
+		return true
+	})
+	return nil
+}
+
+func (m *Manager) HandleConnectionClose(session session.ISession) error {
+	m.InboundMap.Range(func(key, value any) bool {
+		value.(IChannel).HandleConnectionClose(session)
 		return true
 	})
 	return nil

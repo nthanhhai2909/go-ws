@@ -56,6 +56,11 @@ func (chann *Subscribable) Unsubscribe(msg smsg.IMessage, session session.ISessi
 	return nil
 }
 
+func (chann *Subscribable) HandleConnectionClose(session session.ISession) error {
+	chann.Subscribers.Delete(session.GetID())
+	return nil
+}
+
 // Send TODO HGA PROCESS ACK
 func (chann *Subscribable) Send(message smsg.IMessage) error {
 	chann.Subscribers.Range(func(key, value any) bool {

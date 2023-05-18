@@ -13,4 +13,6 @@ type ISubProtocolHandler interface {
 	HandleMessageFromClient(session session.ISession, message message.IMessage)
 
 	SendMessageToClient(session session.ISession, message smsg.IMessage)
+
+	HandleConnectionClose(session session.ISession)
 }

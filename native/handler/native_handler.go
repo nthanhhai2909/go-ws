@@ -37,6 +37,8 @@ func (h *NativeWebsocketHandler) HandleTransportError(session session.ISession, 
 }
 
 func (h *NativeWebsocketHandler) AfterConnectionClosed(session session.ISession, status enums.CloseStatus) error {
+	h.Sessions.Delete(session.GetID())
+	h.SubProtocolHandler.HandleConnectionClose(session)
 	return session.Close()
 }
 
